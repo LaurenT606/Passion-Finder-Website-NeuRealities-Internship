@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PassionFruits</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{min-height:100vh;background:#38167d;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Press Start 2P',monospace;padding:32px 20px}
+        .logo{font-family:'Bangers',cursive;font-size:clamp(2.5rem,6vw,4rem);color:#F7C948;letter-spacing:.08em;-webkit-text-stroke:2px #3A1E00;text-shadow:3px 3px 0 #3A1E00;margin-bottom:6px}
+        .subtitle{font-size:.6rem;color:rgba(200,180,255,.9);letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
+        .hint{font-size:.38rem;color:rgba(255,255,255,.4);letter-spacing:.15em;margin-bottom:28px}
+        .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:clamp(300px,85vw,560px);margin-bottom:32px}
+        .card{background:#4a2090;border:3px solid #5a30a8;border-radius:18px;padding:20px 12px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:.15s;user-select:none;position:relative}
+        .card:hover{background:#5a30a8;border-color:#F7C948}
+        .card.on{background:#F7C948;border-color:#fff}
+        .card.on .name{color:#38167d}
+        .tick{position:absolute;top:8px;right:10px;font-size:.9rem;opacity:0}
+        .card.on .tick{opacity:1}
+        .emoji{font-size:2.8rem;line-height:1}
+        .name{font-size:.5rem;color:#fff;text-align:center;letter-spacing:.08em;text-transform:uppercase;line-height:1.6}
+        .go{font-family:'Press Start 2P',monospace;font-size:.7rem;color:#38167d;background:#F7C948;border:none;border-radius:14px;padding:16px 40px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase}
+        .go:hover{background:#ffe066}
+    </style>
+</head>
+<body>
+<h1 class="logo">PassionFruits</h1>
+<p class="subtitle">Choose your passions</p>
+<p class="hint">Select one or more</p>
+<div class="grid" id="grid"></div>
+<button class="go" onclick="go()">Continue</button>
+<script>
+const H=[
+    {n:'Math',e:'🍎'},{n:'Science',e:'🍋'},{n:'Art',e:'🍉'},
+    {n:'History',e:'🍊'},{n:'English',e:'🍋'},{n:'World Language',e:'🍇'},
+    {n:'Music',e:'🍓'},{n:'Sports',e:'🍌'},{n:'Extra-Curriculars',e:'🍍'}
+];
+const sel=new Set();
+H.forEach(h=>{
+    const d=document.createElement('div');
+    d.className='card';
+    d.innerHTML='<span class="tick">&#10003;</span><span class="emoji">'+h.e+'</span><span class="name">'+h.n+'</span>';
+    d.onclick=()=>{
+        if(sel.has(h.n)){sel.delete(h.n);d.classList.remove('on');}
+        else{sel.add(h.n);d.classList.add('on');}
+    };
+    document.getElementById('grid').appendChild(d);
+});
+function go(){
+    if(!sel.size){alert('Pick at least one!');return;}
+    const a=[...sel];
+    localStorage.setItem('selectedSubjects',JSON.stringify(a));
+    localStorage.setItem('passion',a[0]);
+    location.href='swipe.html';
+}
+</script>
+</body>
+</html>
