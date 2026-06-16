@@ -3,218 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PassionFruits – Log In</title>
+    <title>PassionFruits</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            min-height: 100vh;
-            background-color: #38167d;
+            height: 100vh;
+            background-color: #3C1FA8;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
             font-family: 'Press Start 2P', monospace;
             overflow: hidden;
-            position: relative;
+            padding: 20px 28px 24px;
         }
 
-        canvas#tree {
+        /* ── Header ──────────────────────────────────────────── */
+        header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            position: relative;
+            flex-shrink: 0;
+            margin-bottom: 6px;
+        }
+
+        .login-btn {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-            z-index: 0;
-        }
-
-        .logo {
-            position: relative;
-            z-index: 10;
-            font-family: 'Bangers', cursive;
-            font-size: clamp(3.2rem, 7vw, 5rem);
+            left: 0;
+            top: 6px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(0.55rem, 1.5vw, 0.8rem);
             color: #F7C948;
-            letter-spacing: 0.08em;
+            background: none;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.1em;
+            text-decoration: none;
             text-transform: uppercase;
+        }
+        .login-btn:hover { text-decoration: underline; }
+
+        .site-title {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(3.2rem, 8vw, 7rem);
+            color: #F7C948;
+            letter-spacing: 0.06em;
+            font-style: italic;
             -webkit-text-stroke: 2px #3A1E00;
             text-shadow: 4px 4px 0 #3A1E00;
-            margin-bottom: 24px;
+            line-height: 1;
         }
 
-        .card {
-            position: relative;
-            z-index: 10;
-            background: #2a0e5e;
-            border-radius: 36px;
-            padding: 48px 56px 40px;
-            width: clamp(300px, 90vw, 460px);
+        canvas#pfruit {
+            position: absolute;
+            right: 0;
+            top: -8px;
+            image-rendering: pixelated;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: clamp(0.38rem, 1.1vw, 0.6rem);
+            color: #F7C948;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+            flex-shrink: 0;
+        }
+
+        /* ── Cards ───────────────────────────────────────────── */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(12px, 2vw, 22px);
+            flex: 1;
+            min-height: 0;
+        }
+
+        .feature-card {
+            background: #E8A820;
+            border-radius: 18px;
+            padding: 16px 16px 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            border: 3px solid rgba(247,201,72,0.3);
+            gap: 12px;
+            cursor: pointer;
+            transition: transform 0.22s cubic-bezier(.34,1.56,.64,1),
+                        box-shadow 0.22s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-12px) scale(1.04);
+            box-shadow: 0 18px 44px rgba(0,0,0,0.4);
+        }
+        .feature-card:active {
+            transform: translateY(-4px) scale(1.01);
         }
 
-        .tagline {
-            font-size: clamp(0.6rem, 1.5vw, 0.78rem);
-            color: #FFFFFF;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            text-align: center;
-            margin-bottom: 36px;
-            line-height: 1.8;
-        }
-
-        .form-group {
+        .card-art {
+            flex: 1;
             width: 100%;
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.5rem;
-            color: #aaa;
-            margin-bottom: 8px;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-
-        .form-group input {
-            width: 100%;
-            background: #4a2090;
-            border: none;
-            border-radius: 12px;
-            padding: 14px 18px;
-            font-family: 'Press Start 2P', monospace;
-            font-size: 0.55rem;
-            color: #fff;
-            outline: none;
-            letter-spacing: 0.08em;
-        }
-
-        .form-group input::placeholder { color: rgba(255,255,255,0.3); }
-        .form-group input:focus { box-shadow: 0 0 0 2px #F5C842; }
-
-        .btn-row {
             display: flex;
-            gap: 24px;
-            margin-top: 28px;
-            width: 100%;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+        }
+
+        .card-art canvas {
+            image-rendering: pixelated;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .card-label {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+            color: #3C1FA8;
+            letter-spacing: 0.1em;
+            text-align: center;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        /* ── Video player (card 2) ────────────────────────────── */
+        .video-player {
+            border: 3px solid #FFFFFF;
+            border-radius: 14px;
+            overflow: hidden;
+            width: min(90%, 240px);
+            background: #E8A820;
+            display: flex;
+            flex-direction: column;
+        }
+        .vp-header {
+            background: #E8A820;
+            border-bottom: 3px solid #FFFFFF;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+        .vp-dot { width: 10px; height: 10px; border-radius: 50%; background: #FFFFFF; }
+        .vp-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .play-btn {
+            width: clamp(60px, 10vw, 90px);
+            height: clamp(60px, 10vw, 90px);
+            border: 3px solid #3C1FA8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
             justify-content: center;
         }
-
-        .btn-primary {
-            font-family: 'Press Start 2P', monospace;
-            font-size: clamp(0.55rem, 1.2vw, 0.75rem);
-            color: #FFFFFF;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
+        .play-triangle {
+            width: 0;
+            height: 0;
+            border-top: clamp(14px, 2.5vw, 20px) solid transparent;
+            border-bottom: clamp(14px, 2.5vw, 20px) solid transparent;
+            border-left: clamp(22px, 4vw, 32px) solid #3C1FA8;
+            margin-left: 5px;
+        }
+        .vp-footer {
+            border-top: 3px solid #FFFFFF;
             padding: 10px 20px;
-            border-radius: 10px;
-            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
         }
-
-        .btn-primary:hover { background: rgba(255,255,255,0.1); }
-        .btn-primary:active { transform: scale(0.97); }
-
-        .divider {
-            width: 1px;
-            background: rgba(255,255,255,0.2);
-            align-self: stretch;
+        .vp-x {
+            font-size: clamp(1.4rem, 3vw, 2.2rem);
+            color: #D02828;
+            font-weight: 900;
+            line-height: 1;
         }
-
-        .skip {
-            margin-top: 28px;
-            font-size: 0.5rem;
-            color: rgba(255,255,255,0.45);
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-family: 'Press Start 2P', monospace;
-        }
-        .skip:hover { color: rgba(255,255,255,0.7); }
-
-        .forgot {
-            margin-top: 10px;
-            font-size: 0.45rem;
-            color: rgba(255,255,255,0.35);
-            letter-spacing: 0.1em;
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-family: 'Press Start 2P', monospace;
-            text-transform: uppercase;
-        }
-        .forgot:hover { color: #F5C842; }
     </style>
 </head>
 <body>
-    <canvas id="tree"></canvas>
-    <h1 class="logo">PassionFruits</h1>
-    <div class="card">
-        <p class="tagline">Find Your Passion</p>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
+
+    <header>
+        <a href="Login Page.html" class="login-btn">Login</a>
+        <h1 class="site-title">PASSIONFRUITS</h1>
+        <canvas id="pfruit" width="112" height="112"></canvas>
+    </header>
+
+    <p class="subtitle">Discover your passion today</p>
+
+    <div class="cards">
+
+        <!-- Card 1: Grow Your Tree -->
+        <div class="feature-card">
+            <div class="card-art">
+                <canvas id="tree-canvas" width="180" height="198"></canvas>
+            </div>
+            <span class="card-label">GROW YOUR TREE</span>
         </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+
+        <!-- Card 2: Upload Videos -->
+        <div class="feature-card">
+            <div class="card-art">
+                <div class="video-player">
+                    <div class="vp-header">
+                        <div class="vp-dot"></div>
+                        <div class="vp-dot"></div>
+                        <div class="vp-dot"></div>
+                    </div>
+                    <div class="vp-body">
+                        <div class="play-btn">
+                            <div class="play-triangle"></div>
+                        </div>
+                    </div>
+                    <div class="vp-footer">
+                        <span class="vp-x">✕</span>
+                        <canvas id="pfruit-small" width="40" height="40" style="image-rendering:pixelated"></canvas>
+                    </div>
+                </div>
+            </div>
+            <span class="card-label">UPLOAD VIDEOS</span>
         </div>
-        <button class="forgot">Forgot password?</button>
-        <div class="btn-row">
-            <button class="btn-primary" onclick="handleLogin()">Log In</button>
-            <div class="divider"></div>
-            <button class="btn-primary" onclick="handleSignup()">Sign Up</button>
+
+        <!-- Card 3: Find New Passions -->
+        <div class="feature-card">
+            <div class="card-art">
+                <canvas id="fruits-canvas" width="216" height="156"></canvas>
+            </div>
+            <span class="card-label">FIND NEW PASSIONS</span>
         </div>
-        <button class="skip" onclick="window.location.href='fruitbowl.html'">Skip for now</button>
+
     </div>
 
-    <script>
-        const canvas = document.getElementById('tree');
-        const ctx = canvas.getContext('2d');
-        const P = 8;
-        const K='#1A0800',A='#4F1F06',B='#7A3410',C='#9E501C',D='#BA7028',E='#CC8C3E',F='#DCA852',G='#EEC870';
-        const TRUNK_W=56;
-        const TRUNK_PROFILE=[K,K,A,A,A,A,B,B,B,B,C,C,C,C,D,D,D,D,E,E,E,E,F,F,F,F,G,G,G,G,F,F,F,F,E,E,E,E,D,D,D,D,C,C,C,C,B,B,B,B,A,A,A,A,K,K];
-        const BARK=[{period:13,phase:5,startCol:16,endCol:36,color:C},{period:13,phase:5,startCol:20,endCol:28,color:B},{period:17,phase:2,startCol:24,endCol:44,color:D},{period:17,phase:2,startCol:28,endCol:40,color:C},{period:19,phase:11,startCol:8,endCol:26,color:C},{period:19,phase:11,startCol:12,endCol:22,color:B}];
-        const LEFT_BRANCH=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,1,2,3,3,2,1],[0,0,0,0,0,0,0,1,2,3,3,3,3,2,1],[0,0,0,0,0,1,2,2,3,3,3,3,2,2,1],[0,0,0,1,2,2,3,3,3,3,3,2,2,1,0],[0,1,2,2,3,3,3,3,3,2,2,1,0,0,0],[1,2,2,3,3,3,2,2,1,1,0,0,0,0,0],[1,2,3,3,2,1,1,0,0,0,0,0,0,0,0],[1,2,2,1,0,0,0,0,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0]];
-        const RIGHT_BRANCH=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,2,2,3,3,2,1,0,0,0,0,0,0,0,0,0],[1,2,3,3,3,3,2,2,1,0,0,0,0,0,0,0],[1,2,3,3,3,3,3,3,2,2,1,0,0,0,0,0],[0,1,2,3,3,3,3,3,3,2,2,1,0,0,0,0],[0,0,1,2,3,3,3,3,3,3,2,2,1,1,0,0],[0,0,0,1,2,3,3,3,3,2,2,1,0,0,0,0],[0,0,0,0,1,2,3,3,2,1,0,0,0,0,0,0],[0,0,0,0,0,1,2,1,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0]];
-        const LEFT_BRANCH2=[[0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,1,2,3,2,1],[0,0,0,0,0,1,2,3,3,3,2,1],[0,0,1,2,2,3,3,3,3,2,1,0],[1,2,2,3,3,3,3,2,1,0,0,0],[1,2,3,3,2,2,1,0,0,0,0,0],[0,1,2,1,0,0,0,0,0,0,0,0],[0,0,1,0,0,0,0,0,0,0,0,0]];
-        const BRANCH_COLORS=[null,A,D,G];
-        function px(gx,gy,color){if(!color)return;ctx.fillStyle=color;ctx.fillRect(gx*P,gy*P,P,P);}
-        function drawBranch(map,anchorGx,anchorGy,side){map.forEach((row,ri)=>{row.forEach((val,ci)=>{if(!val)return;const color=BRANCH_COLORS[val];const gx=side==='left'?anchorGx-(row.length-1-ci):anchorGx+ci;px(gx,anchorGy+ri,color);});});}
-        function drawTree(){
-            canvas.width=window.innerWidth;canvas.height=window.innerHeight;
-            const cols=Math.ceil(canvas.width/P)+1,rows=Math.ceil(canvas.height/P)+1;
-            const tcx=Math.round(cols/2),tx=tcx-Math.floor(TRUNK_W/2);
-            for(let r=0;r<rows;r++){for(let c=0;c<TRUNK_W;c++){let color=TRUNK_PROFILE[c];for(const b of BARK){if(r%b.period===b.phase&&c>=b.startCol&&c<b.endCol)color=b.color;}px(tx+c,r,color);}}
-            drawBranch(LEFT_BRANCH,tx,Math.floor(rows*0.27),'left');
-            drawBranch(RIGHT_BRANCH,tx+TRUNK_W,Math.floor(rows*0.54),'right');
-            drawBranch(LEFT_BRANCH2,tx,Math.floor(rows*0.72),'left');
-        }
-        drawTree();
-        window.addEventListener('resize',drawTree);
+<script>
+function drawGrid(ctx, grid, palette, ps, ox, oy) {
+    ox = ox || 0; oy = oy || 0;
+    grid.forEach((row, r) => row.forEach((v, c) => {
+        if (!v) return;
+        ctx.fillStyle = palette[v];
+        ctx.fillRect(ox + c * ps, oy + r * ps, ps, ps);
+    }));
+}
 
-        function handleLogin(){
-            const email=document.getElementById('email').value.trim();
-            const password=document.getElementById('password').value;
-            if(!email||!password){alert('Please enter your email and password.');return;}
-            localStorage.setItem('userEmail', email);
-            window.location.href='fruitbowl.html';
+const PF_PALETTE = {
+    1:'#6B1428', 2:'#9A2040', 3:'#C04060',
+    4:'#E8A070',
+    5:'#C8D030', 6:'#E0E850', 7:'#B8B820',
+    8:'#181810',
+    9:'#1A6010',
+};
+const PF_GRID = [
+    [0,0,0,0,0,0,0,9,0,0,0,0,0,0],
+    [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+    [0,0,1,2,2,4,4,4,4,2,2,1,0,0],
+    [0,1,2,3,4,5,6,5,5,4,3,2,1,0],
+    [1,2,3,4,5,6,5,8,5,6,4,3,2,1],
+    [1,2,3,4,5,5,5,5,8,5,5,3,2,1],
+    [1,2,3,4,8,5,6,5,5,5,4,3,2,1],
+    [1,2,3,4,5,5,5,8,5,6,4,3,2,1],
+    [1,2,3,4,5,8,5,5,5,5,4,3,2,1],
+    [1,2,3,4,5,5,6,5,8,5,4,3,2,1],
+    [0,1,2,3,4,5,5,5,5,4,3,2,1,0],
+    [0,0,1,2,3,4,4,4,4,3,2,1,0,0],
+    [0,0,0,1,1,2,2,2,2,1,1,0,0,0],
+    [0,0,0,0,1,1,1,1,1,1,0,0,0,0],
+];
+
+(function() {
+    const c = document.getElementById('pfruit');
+    drawGrid(c.getContext('2d'), PF_GRID, PF_PALETTE, 8);
+})();
+(function() {
+    const c = document.getElementById('pfruit-small');
+    const ctx = c.getContext('2d');
+    ctx.save(); ctx.scale(40/112, 40/112);
+    drawGrid(ctx, PF_GRID, PF_PALETTE, 8);
+    ctx.restore();
+})();
+
+(function() {
+    const canvas = document.getElementById('tree-canvas');
+    const ctx = canvas.getContext('2d');
+    const P = 9;
+    function px(col, row, color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(col * P, row * P, P, P);
+    }
+    const DK='#174010', D='#256820', M='#3A9030', L='#50B040', H='#6ACC50';
+    const TB='#2A1008', TM='#5A2A10', TL='#8A5030';
+    const rows = [
+        [0,5,15],[1,3,17],[2,2,18],[3,1,19],
+        [4,0,20],[5,0,20],[6,0,20],[7,0,20],
+        [8,0,20],[9,1,19],[10,2,18],[11,3,17],[12,5,15],
+    ];
+    rows.forEach(([r, s, e]) => {
+        for (let c = s; c < e; c++) {
+            const edge = c===s||c===e-1, topBot = r<=1||r>=11;
+            const hilite = !edge&&!topBot&&(c*3+r*7)%11===0;
+            const inner  = !edge&&!topBot&&(c+r)%5===1;
+            px(c, r, edge||r===0||r===12 ? DK : topBot ? D : hilite ? H : inner ? L : M);
         }
-        function handleSignup(){
-            const email=document.getElementById('email').value.trim();
-            const password=document.getElementById('password').value;
-            if(!email||!password){alert('Please enter your email and password.');return;}
-            localStorage.setItem('userEmail', email);
-            window.location.href='fruitbowl.html';
-        }
-    </script>
+    });
+    [[3,2],[3,3],[4,2],[4,3]].forEach(([r,c])=>px(c,r,'#F08820')); px(2,2,'#174010');
+    [[7,16],[7,17],[8,16],[8,17]].forEach(([r,c])=>px(c,r,'#D03030')); px(16,6,'#174010');
+    [[11,0],[11,1],[12,0],[12,1]].forEach(([r,c])=>px(c,r,'#90C020')); px(0,10,'#174010');
+    for (let r=12;r<22;r++) for (let c=8;c<12;c++)
+        px(c,r,c===8||c===11?TB:c===9?TM:TL);
+})();
+
+(function() {
+    const canvas = document.getElementById('fruits-canvas');
+    const ctx = canvas.getContext('2d');
+    const CW=72, CH=78, BG='#3C1FA8', BR=10;
+    function cellBg(col,row) {
+        ctx.fillStyle=BG; ctx.beginPath();
+        ctx.roundRect(col*CW+4, row*CH+4, CW-8, CH-8, BR); ctx.fill();
+    }
+    [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1]].forEach(([c,r])=>cellBg(c,r));
+    function fruit(col,row,grid,palette) {
+        const ps=7, gw=grid[0].length*ps, gh=grid.length*ps;
+        drawGrid(ctx,grid,palette,ps, col*CW+Math.round((CW-gw)/2), row*CH+Math.round((CH-gh)/2));
+    }
+    fruit(0,0,[[0,0,1,0,0,0,0,0],[0,0,1,0,0,0,0,0],[0,2,2,2,2,2,0,0],[2,2,3,2,2,2,2,0],[2,2,3,2,2,2,2,0],[2,2,2,2,2,2,2,0],[0,2,2,2,2,2,0,0],[0,0,2,2,2,0,0,0]],{1:'#1A6010',2:'#C02020',3:'#E04040'});
+    fruit(1,0,[[0,0,0,0,0,0,0,1],[0,0,1,1,1,1,1,1],[0,1,2,2,2,2,1,0],[1,2,2,3,2,2,2,1],[1,2,3,2,2,2,2,1],[0,1,2,2,2,2,1,1],[0,0,1,1,1,1,1,1],[0,0,0,0,0,0,0,1]],{1:'#B89010',2:'#E8D020',3:'#F8F060'});
+    fruit(2,0,[[0,0,0,1,0,0,0,0],[0,0,0,1,0,0,0,0],[0,0,2,2,2,0,0,0],[0,2,2,3,2,2,0,0],[2,2,2,2,2,2,2,0],[2,2,3,2,2,2,2,0],[0,2,2,2,2,2,0,0],[0,0,2,2,2,0,0,0]],{1:'#504010',2:'#80B010',3:'#A8D030'});
+    fruit(0,1,[[0,0,1,1,1,1,0,0],[0,1,2,2,2,2,1,0],[1,2,2,3,2,2,2,1],[1,2,3,2,2,2,2,1],[1,2,2,2,2,2,2,1],[1,2,2,2,2,2,2,1],[0,1,2,2,2,2,1,0],[0,0,1,1,1,1,0,0]],{1:'#B05010',2:'#E07820',3:'#F8A060'});
+    fruit(1,1,[[0,0,0,0,0,0,1,0],[0,2,2,0,2,2,1,0],[2,3,2,2,3,2,2,0],[2,2,2,2,2,2,2,0],[0,2,3,2,2,3,0,0],[0,2,2,2,2,2,0,0],[0,0,2,3,2,0,0,0],[0,0,2,2,2,0,0,0]],{1:'#503010',2:'#5020A0',3:'#7840C0'});
+    fruit(2,1,[[1,0,1,0,1,0,0,0],[0,1,1,1,1,0,0,0],[1,2,3,2,2,2,0,0],[0,2,2,3,2,2,2,0],[0,2,3,2,2,2,2,0],[0,0,2,2,2,2,0,0],[0,0,0,2,2,0,0,0],[0,0,0,0,2,0,0,0]],{1:'#206010',2:'#B81818',3:'#E04040'});
+})();
+</script>
 </body>
 </html>
