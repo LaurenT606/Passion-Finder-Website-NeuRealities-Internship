@@ -202,7 +202,7 @@
             <button class="btn-secondary-login" onclick="handleSignup()">Sign Up</button>
         </div>
 
-        <button class="skip" onclick="window.location.href='fruitbowl.html'">Skip for now</button>
+        <button class="skip" onclick="localStorage.setItem('isLoggedIn','true');localStorage.setItem('userName','Guest');window.location.href='fruitbowl.html'">Skip for now</button>
     </div>
 
     <script>
