@@ -100,7 +100,10 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            cursor: pointer;
         }
+        .tree-half:hover .tree-label { color: #ffe066; }
+        .tree-half:hover #tree-canvas { opacity: 0.85; }
 
         #tree-canvas { image-rendering: pixelated; max-height: 55vh; }
 
@@ -237,7 +240,7 @@
             </div>
         </div>
 
-        <div class="tree-half">
+        <div class="tree-half" onclick="window.location.href='tree.html'" title="Go to your tree">
             <canvas id="tree-canvas"></canvas>
             <div class="tree-label">MY TREE</div>
         </div>
@@ -253,7 +256,7 @@
 
 <script>
 if(!localStorage.getItem('isLoggedIn')){window.location.replace('Login Page.html');}
-function logout(){localStorage.removeItem('isLoggedIn');window.location.href='Login Page.html';}
+function logout(){localStorage.removeItem('isLoggedIn');window.location.href='index.html';}
 // ── Pixel art orange character ────────────────────────────────────────────
 (function drawCharacter() {
     const canvas = document.getElementById('char-canvas');

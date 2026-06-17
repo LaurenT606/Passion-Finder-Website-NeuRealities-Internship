@@ -78,20 +78,25 @@
 
         .tree-frame {
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: center;
-            padding: 10px;
-            border-radius: 10px;
-            border: 3px solid transparent;
-            transition: border-color 0.15s;
+            padding: 14px 10px 10px;
+            border-radius: 14px;
+            border: 3px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            transition: border-color 0.15s, background 0.15s;
             width: 100%;
-            min-height: 180px;
         }
 
-        .tree-frame.selected { border-color: #8855cc; }
+        .tree-frame.selected { border-color: #8855cc; background: rgba(136,85,204,0.15); }
         .tree-frame:hover    { border-color: rgba(136, 85, 204, 0.5); }
 
-        .tree-frame canvas { image-rendering: pixelated; }
+        .tree-frame canvas {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            height: 140px;
+            width: auto;
+        }
 
         .name-pill {
             background: #4a1fa8;
@@ -192,7 +197,7 @@ const TREES = [
     },
     // 3: TRIANGULAR / POINTED (Ahaana)
     {
-        pal: {L:'#1a8a1a',M:'#22bb22',H:'#55dd44',S:'#bbff55',T:'#9B4515',b:'#7B3210',B:'#5C2200'},
+        pal: {L:'#1a8a1a',M:'#22bb22',H:'#55dd44',S:'#bbff55',s:'#99ee33',T:'#9B4515',b:'#7B3210',B:'#5C2200'},
         grid: [
             '        LL        ',
             '       LMML       ',
@@ -264,9 +269,9 @@ const TREES = [
 // Slot 0 = current user (pulled from localStorage), rest are hardcoded friends
 const currentUser = localStorage.getItem('userName') || 'YOU';
 const friends = [
-    { name: currentUser, treeIdx: 0, selected: false },
+    { name: currentUser, treeIdx: 0, selected: true  },
     { name: 'KAI',    treeIdx: 1, selected: false },
-    { name: 'NOAH',   treeIdx: 2, selected: true  },
+    { name: 'NOAH',   treeIdx: 2, selected: false },
     { name: 'AHAANA', treeIdx: 3, selected: false },
     { name: 'SASHA',  treeIdx: 4, selected: false },
     { name: 'JOHN',   treeIdx: 5, selected: false },
