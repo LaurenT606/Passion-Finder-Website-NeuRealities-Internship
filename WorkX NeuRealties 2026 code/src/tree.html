@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PassionFruits – Your Tree</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { min-height:100vh; background-color:#38167d; font-family:'Press Start 2P',monospace; overflow:hidden; user-select:none; }
+        .nav { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; border-bottom:3px solid rgba(255,255,255,0.1); position:relative; z-index:20; }
+        .logo { font-family:'Bangers',cursive; font-size:2rem; color:#F7C948; letter-spacing:0.08em; -webkit-text-stroke:1.5px #3A1E00; text-shadow:2px 2px 0 #3A1E00; }
+        .book-btn { font-family:'Press Start 2P',monospace; font-size:0.45rem; color:#38167d; background:#F7C948; border:none; border-radius:10px; padding:10px 16px; cursor:pointer; }
+        .book-btn:hover { background:#ffe066; }
+        .stage { position:relative; width:100%; height:calc(100vh - 62px - 70px); display:flex; align-items:center; justify-content:center; }
+        .footer-banner { display:flex; align-items:center; justify-content:space-around; height:70px; background:#F7C948; border-top:3px solid #3A1E00; padding:0 24px; }
+        .footer-banner span { font-family:'Press Start 2P',monospace; color:#3C1FA8; letter-spacing:0.08em; text-transform:uppercase; font-size:clamp(0.7rem,2.2vw,1.1rem); text-shadow:1px 1px 0 rgba(58,30,0,0.15); }
+        canvas#tree-canvas { position:absolute; image-rendering:pixelated; }
+        .node { position:absolute; cursor:pointer; transform:translate(-50%,-50%); z-index:10; }
+        .node canvas { image-rendering:pixelated; display:block; }
+        .node:hover canvas { filter:brightness(1.4); }
+        .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:100; align-items:center; justify-content:center; }
+        .overlay.active { display:flex; }
+        .popup { background:#2a0e5e; border:4px solid #fff; border-radius:22px; padding:36px 40px; width:clamp(280px,90vw,440px); display:flex; flex-direction:column; align-items:center; gap:18px; position:relative; }
+        .popup-close { position:absolute; top:14px; right:18px; background:none; border:none; color:rgba(255,255,255,0.4); font-size:0.9rem; cursor:pointer; font-family:'Press Start 2P',monospace; }
+        .popup-close:hover { color:#fff; }
+        .popup-emoji { font-size:2.8rem; }
+        .popup-title { font-size:0.58rem; color:#F7C948; text-align:center; letter-spacing:0.1em; line-height:2; text-transform:uppercase; }
+        .popup-sub { font-size:0.4rem; color:rgba(255,255,255,0.6); text-align:center; line-height:2.2; letter-spacing:0.07em; }
+        .popup-btns { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:4px; }
+        .btn-yes { font-family:'Press Start 2P',monospace; font-size:0.48rem; color:#1a4a1a; background:#44dd44; border:none; border-radius:10px; padding:12px 20px; cursor:pointer; }
+        .btn-yes:hover { background:#66ff66; }
+        .btn-no { font-family:'Press Start 2P',monospace; font-size:0.48rem; color:#fff; background:#cc2222; border:none; border-radius:10px; padding:12px 20px; cursor:pointer; }
+        .btn-no:hover { background:#ff4444; }
+        .btn-skip { font-family:'Press Start 2P',monospace; font-size:0.48rem; color:#fff; background:#555; border:none; border-radius:10px; padding:12px 20px; cursor:pointer; }
+        .btn-skip:hover { background:#777; }
+        .btn-gold { font-family:'Press Start 2P',monospace; font-size:0.48rem; color:#38167d; background:#F7C948; border:none; border-radius:10px; padding:12px 20px; cursor:pointer; }
+        .btn-gold:hover { background:#ffe066; }
+        .btn-purple { font-family:'Press Start 2P',monospace; font-size:0.48rem; color:#fff; background:#5a30a8; border:none; border-radius:10px; padding:12px 20px; cursor:pointer; }
+        .btn-purple:hover { background:#7a50c8; }
+        .book-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; align-items:center; justify-content:center; }
+        .book-overlay.active { display:flex; }
+        .book { background:#2a0e5e; border:4px solid #F7C948; border-radius:22px; padding:36px; width:clamp(300px,92vw,520px); max-height:80vh; overflow-y:auto; position:relative; }
+        .book-title { font-family:'Bangers',cursive; font-size:2rem; color:#F7C948; letter-spacing:0.1em; text-align:center; margin-bottom:24px; }
+        .book-entry { border:2px solid rgba(255,255,255,0.2); border-radius:12px; padding:16px; margin-bottom:14px; display:flex; align-items:center; gap:16px; }
+        .book-fruit { font-size:2rem; }
+        .book-info { display:flex; flex-direction:column; gap:6px; }
+        .book-activity { font-size:0.4rem; color:#F7C948; letter-spacing:0.08em; line-height:1.8; }
+        .book-subject { font-size:0.33rem; color:rgba(255,255,255,0.5); letter-spacing:0.1em; text-transform:uppercase; }
+        .book-empty { font-size:0.4rem; color:rgba(255,255,255,0.4); text-align:center; line-height:2.8; }
+        .book-close { position:absolute; top:14px; right:18px; background:none; border:none; color:rgba(255,255,255,0.4); font-size:0.9rem; cursor:pointer; font-family:'Press Start 2P',monospace; }
+        .book-close:hover { color:#fff; }
+        .basket-btn { position:absolute; top:62%; left:62%; transform:translateY(-50%); background:transparent; border:none; cursor:pointer; z-index:30; transition:transform 0.15s; padding:0; }
+        .basket-btn:hover { transform:translateY(-50%) scale(1.05); }
+        .basket-btn img { display:block; width:min(34vw, 320px); height:auto; }
+        .add-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; max-height:50vh; overflow-y:auto; }
+        .add-card { background:#4a2090; border:3px solid #5a30a8; border-radius:14px; padding:14px 8px 10px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; transition:.15s; position:relative; }
+        .add-card:hover { background:#5a30a8; border-color:#F7C948; }
+        .add-card.on { background:#F7C948; border-color:#fff; }
+        .add-card.on .add-name { color:#38167d; }
+        .add-card.disabled { opacity:0.35; cursor:not-allowed; }
+        .add-tick { position:absolute; top:5px; right:7px; font-size:0.6rem; opacity:0; }
+        .add-card.on .add-tick { opacity:1; }
+        .add-emoji { font-size:1.8rem; line-height:1; }
+        .add-name { font-size:0.32rem; color:#fff; text-align:center; letter-spacing:0.06em; text-transform:uppercase; line-height:1.5; }
+    </style>
+</head>
+<body>
+<div class="nav">
+    <span class="logo">PassionFruits</span>
+    <button class="book-btn" onclick="openBook()">📖 My Book</button>
+</div>
+<div class="stage" id="stage">
+    <canvas id="tree-canvas"></canvas>
+    <div class="basket-btn" onclick="openBasket()" title="Add more passions">
+        <img id="basket-img" src="basket.png" alt="Fruit basket - add more passions">
+    </div>
+</div>
+<div class="footer-banner">
+    <span>The Fruitbowl</span>
+    <span>Farmers Market</span>
+</div>
+<div class="overlay" id="overlay">
+    <div class="popup">
+        <button class="popup-close" onclick="closePopup()">✕</button>
+        <div class="popup-emoji" id="pop-emoji">🌱</div>
+        <p class="popup-title" id="pop-title"></p>
+        <p class="popup-sub" id="pop-sub"></p>
+        <div class="popup-btns" id="pop-btns"></div>
+    </div>
+</div>
+<div class="book-overlay" id="book-overlay">
+    <div class="book">
+        <button class="book-close" onclick="closeBook()">✕</button>
+        <div class="book-title">📖 My Book</div>
+        <div id="book-entries"></div>
+    </div>
+</div>
+<div class="book-overlay" id="basket-overlay">
+    <div class="book">
+        <button class="book-close" onclick="closeBasket()">✕</button>
+        <div class="book-title">🧺 Add Passions</div>
+        <p class="popup-sub" style="margin-bottom:18px;">Pick more subjects to grow new fruit</p>
+        <div class="add-grid" id="add-grid"></div>
+        <div class="popup-btns" style="margin-top:20px;">
+            <button class="btn-gold" onclick="confirmBasket()">Add &amp; Swipe →</button>
+        </div>
+    </div>
+</div>
+<script>
+const SUBJECT_EMOJI={'Math':'🍎','Science':'🍋','Art':'🍉','History':'🍊','English':'🍋','World Language':'🍇','Music':'🍓','Sports':'🍌','Extra-Curriculars':'🍍'};
+const ALL_ACTIVITIES={'Math':['Coding projects','Math olympiad prep','Chess club','Personal finance & budgeting','Puzzle & logic games'],'Science':['Science fair experiments','Stargazing & astronomy','Coding a game','Growing a plant from seed','DIY electronics & circuits'],'Art':['Sketchbook drawing','Digital art & design','Graphic novel making','Phone photography','Mural & street art'],'History':['Local history research','Museum visits','Documentary watching','Historical podcast listening','Family genealogy'],'English':['Fan fiction writing','Poetry writing','Starting a blog','Journaling daily','School newspaper'],'World Language':['Duolingo streaks','Listening to foreign music','Pen pal exchange','Watching subtitled anime','Cooking dishes from other cultures'],'Music':['Learning guitar','Producing beats','Joining a school choir','DJ-ing at school events','Songwriting & lyrics'],'Sports':['Recreational basketball','Skateboarding','Rock climbing gym','Yoga & stretching','Martial arts classes'],'Extra-Curriculars':['Student council','Debate team','Volunteering locally','Environmental club','Yearbook & school media']};
+const FRUIT_PALS={'🍎':{'1':'#cc1111','2':'#1a7a1a','3':'#ff6666'},'🍋':{'1':'#ddcc00','2':'#1a7a1a','3':'#ffee66'},'🍉':{'1':'#cc2233','2':'#1a7a1a','3':'#ff6677'},'🍊':{'1':'#dd6600','2':'#1a7a1a','3':'#ffaa44'},'🍇':{'1':'#882299','2':'#1a7a1a','3':'#cc66ee'},'🍓':{'1':'#cc1133','2':'#1a7a1a','3':'#ff6688'},'🍌':{'1':'#ddbb00','2':'#1a7a1a','3':'#ffee44'},'🍍':{'1':'#cc8800','2':'#1a7a1a','3':'#ffcc44'}};
+const passion=localStorage.getItem('passion')||'Math';
+const emoji=SUBJECT_EMOJI[passion]||'🍎';
+const selected=JSON.parse(localStorage.getItem('selectedSubjects')||'null');
+const votes=JSON.parse(localStorage.getItem('votes')||'{}');
+// Build pool from all selected subjects, prioritising subjects with more votes
+const pool=(selected||[passion]).reduce(function(acc,s){return acc.concat(ALL_ACTIVITIES[s]||[]);} ,[]);
+let buds=JSON.parse(localStorage.getItem('pf_buds')||'null');
+if(!buds){
+    // Pick 3 activities spread across selected subjects
+    const subjects=selected||[passion];
+    const picked=[];
+    let si=0;
+    while(picked.length<3 && picked.length<pool.length){
+        const subj=subjects[si%subjects.length];
+        const acts=ALL_ACTIVITIES[subj]||[];
+        const act=acts.find(function(a){return !picked.find(function(p){return p.activity===a;});});
+        if(act) picked.push({id:picked.length,activity:act,subject:subj,stage:'bud'});
+        si++;
+        if(si>subjects.length*10) break;
+    }
+    buds=picked;
+    localStorage.setItem('pf_buds',JSON.stringify(buds));
+}
+let bookEntries=JSON.parse(localStorage.getItem('pf_book')||'[]');
+let skipped=JSON.parse(localStorage.getItem('pf_skipped')||'[]');
+const PS=14;
+const SMALL_PAL={T:'#8B4513',b:'#6B3410',B:'#5C2A00',L:'#1a7a1a',M:'#22aa22',H:'#44cc44',S:'#aaff66'};
+const SMALL_TREE=['      LLLLLL      ','    LLMHHHMMLL    ','   LMHHSHHSHHML   ','   LMHHHHHHHML    ','    LLMMHHMML     ','      LLLLLL      ','        TT        ','       TbBT       ','      TTbBTT      ','  LLL TTbBT TLL   ',' LMHL TTbBT LHML  ',' LMHL  TbT  LHML  ','  LLL  TBT  LLL   ','        TbT       ','        TBT       ','        TbT       '];
+const BIG_PAL={T:'#8B4513',b:'#6B3410',B:'#5C2A00',L:'#146b14',M:'#22aa22',H:'#44cc44',h:'#66ee44',S:'#aaff66'};
+const BIG_TREE=['         LLLLLLL         ','      LLMMMHHHMMLL       ','    LLMHHSSSHHSSSHMLL    ','   LMHHHSSSHHHSSSHHHMLL  ','  LMHHHSSSHHHHHSSSHHHMLl ','  LMHHHHHHHHHHHHHHHHMll  ',' LLMHHHHHHHHHHHHHHHMMLl  ',' LMMHHHHhhhHHHHhhhHHMML  ',' LMMHHHHHHHHHHHHHHHMMLl  ','  LMHHHHHHHHHHHHHHHMLl   ','  LLMMHHHHHHHHHHHHMMLl   ','   LLMMMHHHHHHHHMMMll    ','    LLLMMMMMMMMMMLl      ','      LLLLLLLLLl         ','          TTT            ','         TbBbT           ','        TTbBbTT          ','        TbBBBbT          ','       TTbBBBbTT         ','       TbBBBBBbT         ','        TbBBBbT          ','         TbBbT           ','          TbT            ','          TBT            ','          TbT            '];
+function drawTree(ctx,big){const grid=big?BIG_TREE:SMALL_TREE;const pal=big?BIG_PAL:SMALL_PAL;ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);grid.forEach((row,r)=>[...row].forEach((ch,c)=>{const col=pal[ch];if(!col)return;ctx.fillStyle=col;ctx.fillRect(c*PS,r*PS,PS,PS);}));}
+const BUD_PAL={'1':'#0d5c0d','2':'#22aa22','3':'#aaff66','4':'#5C2A00'};
+const BUD_GRID=['00111000','01222100','12233210','12333210','01222100','00141000','00040000','00040000'];
+const FRUIT_BASE=['00010000','00020000','01111100','13111110','11111110','11111110','01111100','00111000'];
+function drawBudCanvas(canvas){const ps=7;canvas.width=8*ps;canvas.height=8*ps;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);BUD_GRID.forEach((row,r)=>[...row].forEach((ch,c)=>{const col=BUD_PAL[ch];if(!col)return;ctx.fillStyle=col;ctx.fillRect(c*ps,r*ps,ps,ps);}));}
+function drawFruitCanvas(canvas,em){const ps=7;canvas.width=8*ps;canvas.height=8*ps;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);const pal=FRUIT_PALS[em]||FRUIT_PALS['🍎'];FRUIT_BASE.forEach((row,r)=>[...row].forEach((ch,c)=>{const col=pal[ch];if(!col)return;ctx.fillStyle=col;ctx.fillRect(c*ps,r*ps,ps,ps);}));}
+const NODE_POS_SMALL=[[0.15,0.62],[0.50,0.10],[0.85,0.62]];
+const NODE_POS_BIG=[[0.18,0.50],[0.50,0.06],[0.82,0.50]];
+function render(){const stage=document.getElementById('stage');const canvas=document.getElementById('tree-canvas');const stageW=stage.clientWidth;const stageH=stage.clientHeight;const allFruit=buds.every(b=>b.stage==="fruit");const grid=allFruit?BIG_TREE:SMALL_TREE;canvas.width=grid[0].length*PS;canvas.height=grid.length*PS;const scale=Math.min(stageW/canvas.width,stageH/canvas.height,2)*0.82;canvas.style.width=(canvas.width*scale)+'px';canvas.style.height=(canvas.height*scale)+'px';drawTree(canvas.getContext("2d"),allFruit);stage.querySelectorAll('.node').forEach(n=>n.remove());const dispW=canvas.width*scale;const dispH=canvas.height*scale;const offX=(stageW-dispW)/2;const offY=(stageH-dispH)/2;const positions=allFruit?NODE_POS_BIG:NODE_POS_SMALL;buds.forEach((bud,i)=>{const[xf,yf]=positions[i];const x=offX+xf*dispW;const y=offY+yf*dispH;const node=document.createElement('div');node.className='node';node.style.left=x+'px';node.style.top=y+'px';const nc=document.createElement('canvas');if(bud.stage==='bud')drawBudCanvas(nc);else drawFruitCanvas(nc,emoji);nc.style.width=(nc.width*scale*0.7)+'px';nc.style.height=(nc.height*scale*0.7)+'px';node.appendChild(nc);node.addEventListener('click',()=>openPopup(bud.id));stage.appendChild(node);});}
+function nextActivity(){const used=[...buds.map(b=>b.activity),...skipped];return pool.find(a=>!used.includes(a))||null;}
+let activeId=null;
+function openPopup(id){activeId=id;const bud=buds.find(b=>b.id===id);const btns=document.getElementById('pop-btns');document.getElementById('pop-emoji').textContent=bud.stage==='bud'?'🌱':emoji;document.getElementById('pop-title').textContent=bud.activity;btns.innerHTML='';if(bud.stage==='bud'){document.getElementById('pop-sub').textContent='Did you try this activity?';btns.appendChild(mkBtn('btn-yes','✓ Done it!',()=>markDone(id)));btns.appendChild(mkBtn('btn-skip','↩ Swap it',()=>skipActivity(id)));btns.appendChild(mkBtn('btn-no','✗ Not yet',closePopup));}else{document.getElementById('pop-sub').textContent='You completed this and grew a fruit!';btns.appendChild(mkBtn('btn-gold','🏆 Reward Info',()=>showInfo(bud)));btns.appendChild(mkBtn('btn-purple','🌱 New Branch',()=>newBranch(id)));}document.getElementById('overlay').classList.add('active');}
+function mkBtn(cls,label,fn){const b=document.createElement('button');b.className=cls;b.textContent=label;b.onclick=fn;return b;}
+function closePopup(){document.getElementById('overlay').classList.remove('active');activeId=null;}
+function markDone(id){const bud=buds.find(b=>b.id===id);bud.stage='fruit';bookEntries.push({activity:bud.activity,subject:bud.subject,emoji});saveState();closePopup();render();}
+function skipActivity(id){const bud=buds.find(b=>b.id===id);skipped.push(bud.activity);const next=nextActivity();if(next){bud.activity=next;}else{skipped=[];const used=buds.map(b=>b.activity);bud.activity=pool.find(a=>!used.includes(a))||pool[0];}saveState();closePopup();render();}
+function showInfo(bud){document.getElementById('pop-emoji').textContent='🏆';document.getElementById('pop-title').textContent='Reward Earned!';document.getElementById('pop-sub').textContent='You completed "'+bud.activity+'" in '+bud.subject+'. Keep it up!';const btns=document.getElementById('pop-btns');btns.innerHTML='';btns.appendChild(mkBtn('btn-gold','Nice! ✓',closePopup));}
+function newBranch(id){const bud=buds.find(b=>b.id===id);const next=nextActivity();if(next){bud.activity=next;bud.stage='bud';}else{skipped=[];const used=buds.filter(b=>b.id!==id).map(b=>b.activity);bud.activity=pool.find(a=>!used.includes(a))||pool[0];bud.stage='bud';}saveState();closePopup();render();}
+function openBook(){const el=document.getElementById('book-entries');el.innerHTML=bookEntries.length===0?'<p class="book-empty">No fruits yet.<br>Complete an activity<br>to grow your first fruit! 🌱</p>':bookEntries.map(e=>'<div class="book-entry"><span class="book-fruit">'+e.emoji+'</span><div class="book-info"><span class="book-activity">'+e.activity+'</span><span class="book-subject">'+e.subject+'</span></div></div>').join('');document.getElementById('book-overlay').classList.add('active');}
+function closeBook(){document.getElementById('book-overlay').classList.remove('active');}
+function saveState(){localStorage.setItem('pf_buds',JSON.stringify(buds));localStorage.setItem('pf_book',JSON.stringify(bookEntries));localStorage.setItem('pf_skipped',JSON.stringify(skipped));}
+window.addEventListener('resize',render);
+render();
+
+// ── Fruit basket: add more passions ──────────────────────────
+const ALL_SUBJECTS = Object.keys(SUBJECT_EMOJI);
+
+let basketSel = new Set();
+
+function openBasket() {
+    const grid = document.getElementById('add-grid');
+    grid.innerHTML = '';
+    basketSel = new Set();
+    const already = selected || [passion];
+    ALL_SUBJECTS.forEach(subj => {
+        const taken = already.includes(subj);
+        const card = document.createElement('div');
+        card.className = 'add-card' + (taken ? ' disabled' : '');
+        card.innerHTML = '<span class="add-tick">✓</span><span class="add-emoji">'+(SUBJECT_EMOJI[subj]||'🍎')+'</span><span class="add-name">'+subj+(taken?' (added)':'')+'</span>';
+        if (!taken) {
+            card.onclick = () => {
+                if (basketSel.has(subj)) { basketSel.delete(subj); card.classList.remove('on'); }
+                else { basketSel.add(subj); card.classList.add('on'); }
+            };
+        }
+        grid.appendChild(card);
+    });
+    document.getElementById('basket-overlay').classList.add('active');
+}
+
+function closeBasket() {
+    document.getElementById('basket-overlay').classList.remove('active');
+}
+
+function confirmBasket() {
+    if (basketSel.size === 0) { alert('Pick at least one new passion!'); return; }
+    const already = selected || [passion];
+    const merged = [...new Set([...already, ...basketSel])];
+    localStorage.setItem('selectedSubjects', JSON.stringify(merged));
+    // Flag swipe page to filter to just the newly-added subjects this round
+    localStorage.setItem('swipeFilterOnly', JSON.stringify([...basketSel]));
+    window.location.href = 'swipe.html';
+}
+
+</script>
+</body>
+</html>

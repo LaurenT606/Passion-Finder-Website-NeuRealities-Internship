@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PassionFruits – Your Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background-color: #3C1FA8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Press Start 2P', monospace;
+            overflow-y: auto;
+            padding: 40px 20px 60px;
+        }
+
+        /* Header  */
+        .site-logo {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            color: #F7C948;
+            letter-spacing: 0.08em;
+            -webkit-text-stroke: 2px #3A1E00;
+            text-shadow: 3px 3px 0 #3A1E00;
+            margin-bottom: 28px;
+        }
+
+        /* Passion reveal card */
+        .passion-card {
+            width: clamp(300px, 88vw, 600px);
+            border: 4px solid #FFFFFF;
+            border-radius: 22px;
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+
+        .passion-header {
+            background: #4B2CB5;
+            border-bottom: 4px solid #FFFFFF;
+            padding: 14px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .passion-header-title {
+            font-size: clamp(0.6rem, 2vw, 0.85rem);
+            color: #F7C948;
+            letter-spacing: 0.12em;
+        }
+
+        .window-dots { display: flex; gap: 7px; }
+        .window-dots span {
+            width: 14px; height: 14px;
+            border-radius: 50%; background: #FFFFFF; display: block;
+        }
+
+        .passion-body {
+            background: #4B2CB5;
+            padding: 36px 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .passion-label {
+            font-size: 0.5rem;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .passion-name {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(2.8rem, 8vw, 5rem);
+            color: #F7C948;
+            letter-spacing: 0.08em;
+            -webkit-text-stroke: 2px #3A1E00;
+            text-shadow: 3px 3px 0 #3A1E00;
+            text-align: center;
+        }
+
+        .passion-desc {
+            font-size: 0.45rem;
+            color: rgba(255,255,255,0.65);
+            text-align: center;
+            line-height: 2.2;
+            letter-spacing: 0.08em;
+            max-width: 440px;
+            margin-top: 8px;
+        }
+
+        /* Score bar */
+        .score-section {
+            width: clamp(300px, 88vw, 600px);
+            margin-bottom: 28px;
+        }
+
+        .section-title {
+            font-size: 0.5rem;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .score-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .score-label {
+            font-size: 0.38rem;
+            color: #FFFFFF;
+            width: 120px;
+            flex-shrink: 0;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .score-bar-bg {
+            flex: 1;
+            height: 10px;
+            background: rgba(255,255,255,0.15);
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            background: #F7C948;
+            transition: width 1s ease;
+        }
+
+        .score-count {
+            font-size: 0.38rem;
+            color: rgba(255,255,255,0.5);
+            width: 24px;
+            text-align: right;
+        }
+
+        /* Resources grid  */
+        .resources-section {
+            width: clamp(300px, 88vw, 600px);
+            margin-bottom: 32px;
+        }
+
+        .resource-card {
+            border: 3px solid #FFFFFF;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .resource-header {
+            background: #4B2CB5;
+            border-bottom: 3px solid #FFFFFF;
+            padding: 10px 18px;
+        }
+
+        .resource-type {
+            font-size: 0.38rem;
+            color: #F7C948;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .resource-body {
+            background: #3C1FA8;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .resource-name {
+            font-size: 0.5rem;
+            color: #FFFFFF;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            line-height: 1.8;
+        }
+
+        .resource-desc {
+            font-size: 0.38rem;
+            color: rgba(255,255,255,0.55);
+            letter-spacing: 0.06em;
+            line-height: 2;
+        }
+
+        /* Buttons  */
+        .action-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.55rem;
+            color: #3C1FA8;
+            background: #F7C948;
+            border: none;
+            padding: 14px 26px;
+            cursor: pointer;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-radius: 4px;
+            transition: opacity 0.15s;
+        }
+        .btn-primary:hover { opacity: 0.85; }
+
+        .btn-secondary {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.55rem;
+            color: rgba(255,255,255,0.6);
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 14px 26px;
+            cursor: pointer;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-radius: 4px;
+            transition: border-color 0.15s, color 0.15s;
+        }
+        .btn-secondary:hover {
+            border-color: rgba(255,255,255,0.7);
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="site-logo">PassionFruits</h1>
+
+    <!-- Passion reveal -->
+    <div class="passion-card">
+        <div class="passion-header">
+            <span class="passion-header-title">RESULTS</span>
+            <div class="window-dots">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="passion-body">
+            <span class="passion-label">Your passion is</span>
+            <span class="passion-name" id="passion-name">—</span>
+            <p class="passion-desc" id="passion-desc"></p>
+        </div>
+    </div>
+
+    <!-- Score breakdown -->
+    <div class="score-section" id="score-section" style="display:none">
+        <p class="section-title">How you scored</p>
+        <div id="score-bars"></div>
+    </div>
+
+    <!-- Resources -->
+    <div class="resources-section">
+        <p class="section-title" style="margin-bottom:20px">Things to explore</p>
+        <div id="resources-list"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-row">
+        <button class="btn-primary" onclick="window.location.href='Swipe Page.html'">Try again</button>
+        <button class="btn-secondary" onclick="window.location.href='tree.html'">Grow My Tree</button>
+    </div>
+
+<script>
+// Resource data
+const RESOURCES = {
+    'Math': {
+        desc: 'You love problem-solving, logic, and numbers. Math is everywhere — from game design to finance to science.',
+        items: [
+            { type: 'Website',  name: 'Khan Academy',         desc: 'Free courses from basic arithmetic to university-level calculus.' },
+            { type: 'Challenge',name: 'Project Euler',         desc: 'Hundreds of math puzzles that require a mix of maths and programming.' },
+            { type: 'YouTube',  name: '3Blue1Brown',           desc: 'Beautiful visual explanations of advanced math concepts.' },
+            { type: 'Book',     name: 'The Art of Problem Solving', desc: 'The go-to series for math competition prep and deep thinking.' },
+            { type: 'Activity', name: 'Join a Math Olympiad',  desc: 'AMC, MATHCOUNTS, and local competitions to sharpen your skills.' },
+        ]
+    },
+    'Science': {
+        desc: 'You are curious about how the world works. Science is about asking questions no one has answered yet.',
+        items: [
+            { type: 'Website',  name: 'NASA Citizen Science',  desc: 'Contribute to real NASA research projects from your browser.' },
+            { type: 'App',      name: 'iNaturalist',           desc: 'Identify plants & animals and contribute to biodiversity data.' },
+            { type: 'YouTube',  name: 'Crash Course Science',  desc: 'Fast, fun overviews of biology, chemistry, physics, and more.' },
+            { type: 'Website',  name: 'Science Buddies',       desc: 'Step-by-step project guides for science fairs at every level.' },
+            { type: 'Activity', name: 'DIY Electronics',        desc: 'Start with an Arduino or Raspberry Pi kit and build your first circuit.' },
+        ]
+    },
+    'Art': {
+        desc: 'You see the world visually and love creating. Art sharpens observation, imagination, and communication.',
+        items: [
+            { type: 'App',      name: 'Procreate / Sketchbook', desc: 'Industry-standard drawing apps for tablets and phones.' },
+            { type: 'Website',  name: 'Ctrl+Paint',              desc: 'Free digital painting fundamentals taught step by step.' },
+            { type: 'Platform', name: 'DeviantArt',              desc: 'Share your work, get feedback, and find a creative community.' },
+            { type: 'Book',     name: 'Drawing on the Right Side of the Brain', desc: 'The classic guide to learning how to really see and draw.' },
+            { type: 'Activity', name: 'Urban Sketching',         desc: 'Take a sketchbook outside and draw your neighbourhood — daily practice.' },
+        ]
+    },
+    'History': {
+        desc: 'You want to understand where we came from. History gives context to everything happening right now.',
+        items: [
+            { type: 'YouTube',  name: 'Crash Course History',   desc: 'Entertaining deep-dives into world, US, and European history.' },
+            { type: 'Website',  name: 'Smithsonian Magazine',   desc: 'Accessible long-reads on history, science, and culture.' },
+            { type: 'Website',  name: 'National Archives',       desc: 'Explore primary sources and original historical documents.' },
+            { type: 'Activity', name: 'Family Genealogy',        desc: 'Use Ancestry or FamilySearch to trace your own family history.' },
+            { type: 'Activity', name: 'Local Historical Society', desc: 'Volunteer or visit — every town has stories waiting to be found.' },
+        ]
+    },
+    'English': {
+        desc: 'You love language, stories, and ideas. Strong writing and reading are superpowers in every field.',
+        items: [
+            { type: 'Event',    name: 'NaNoWriMo',              desc: 'Write a novel in November — a global community of writers does it together.' },
+            { type: 'Platform', name: 'Wattpad',                 desc: 'Publish your stories and read millions of others for free.' },
+            { type: 'Podcast',  name: 'The Moth',                desc: 'True stories told live — a masterclass in narrative structure.' },
+            { type: 'Book',     name: 'Bird by Bird – Anne Lamott', desc: 'The most honest and encouraging guide to the writing life.' },
+            { type: 'Activity', name: 'School Literary Magazine', desc: 'Submit your writing or join the editorial team.' },
+        ]
+    },
+    'World Language': {
+        desc: 'You are drawn to other cultures and ways of thinking. Language is the fastest path to real understanding.',
+        items: [
+            { type: 'App',      name: 'Duolingo',                desc: 'Daily streaks and gamified lessons for 40+ languages, free.' },
+            { type: 'App',      name: 'Tandem',                  desc: 'Practice with native speakers around the world via text and voice.' },
+            { type: 'Website',  name: 'FluentU',                 desc: 'Learn through real-world videos — music, news, and movie clips.' },
+            { type: 'Activity', name: 'Pen Pal Exchange',         desc: 'Platforms like InterPals connect you with students worldwide.' },
+            { type: 'Activity', name: 'Cook a Foreign Dish',      desc: 'Cooking a dish in its cultural context is a full-immersion experience.' },
+        ]
+    },
+    'Music': {
+        desc: 'You feel things through sound. Music combines creativity, discipline, math, and emotion all at once.',
+        items: [
+            { type: 'App',      name: 'Yousician',               desc: 'Learn guitar, piano, or ukulele through interactive lessons and songs.' },
+            { type: 'App',      name: 'GarageBand / FL Studio',  desc: 'Free and affordable tools to start producing your own tracks.' },
+            { type: 'YouTube',  name: 'Adam Neely',              desc: 'Deep music theory explained in a way that actually makes sense.' },
+            { type: 'Activity', name: 'School Band or Choir',     desc: 'Performing with others builds skills no solo practice can.' },
+            { type: 'Activity', name: 'Open Mic Night',           desc: 'Local coffee shops and community centres host beginner-friendly events.' },
+        ]
+    },
+    'Sports': {
+        desc: 'You are energised by movement, challenge, and pushing limits. Sport builds discipline that transfers to everything.',
+        items: [
+            { type: 'App',      name: 'Nike Training Club',       desc: 'Free workouts from beginner to elite, no equipment needed.' },
+            { type: 'YouTube',  name: 'Athlean-X',                desc: 'Science-backed fitness and athletic training for all levels.' },
+            { type: 'Activity', name: 'Recreational League',       desc: 'Local parks and rec departments run low-cost leagues for most sports.' },
+            { type: 'Activity', name: 'Try a New Sport',           desc: 'Rock climbing, martial arts, and ultimate frisbee are easy to start.' },
+            { type: 'Resource', name: 'TeamSnap / SportsEngine',   desc: 'Find local teams and sign-up opportunities near you.' },
+        ]
+    },
+    'Extra-Curriculars': {
+        desc: 'You thrive on leadership, community, and making things happen. These skills define careers and change communities.',
+        items: [
+            { type: 'Activity', name: 'Student Council',           desc: 'Advocate for your school community and run real projects.' },
+            { type: 'Activity', name: 'Debate Team',               desc: 'Builds critical thinking, public speaking, and research skills fast.' },
+            { type: 'Website',  name: 'VolunteerMatch',            desc: 'Find local volunteer opportunities matched to your interests.' },
+            { type: 'Activity', name: 'Model UN',                  desc: 'Research world issues and represent countries in a global simulation.' },
+            { type: 'Activity', name: 'Start a Club',              desc: 'If the right club does not exist at your school — start it.' },
+        ]
+    },
+};
+
+const DEFAULT = {
+    desc: 'You are still discovering what excites you — that is perfectly fine. Keep exploring!',
+    items: [
+        { type: 'Activity', name: 'Try something new each week', desc: 'Pick one activity from any category and give it 30 minutes.' },
+        { type: 'Website',  name: 'Coursera / edX',              desc: 'Free taster courses across every subject imaginable.' },
+    ]
+};
+
+// ── Load results ─────────────────────────────────────────────
+const passion = localStorage.getItem('passion') || 'Exploration';
+const votes   = JSON.parse(localStorage.getItem('votes') || '{}');
+const data    = RESOURCES[passion] || DEFAULT;
+
+document.getElementById('passion-name').textContent = passion;
+document.getElementById('passion-desc').textContent = data.desc;
+
+// Score bars
+const totalVotes = Object.values(votes).reduce((s,v) => s+v, 0);
+if (totalVotes > 0) {
+    const scoreSection = document.getElementById('score-section');
+    scoreSection.style.display = 'block';
+    const barsEl = document.getElementById('score-bars');
+    const sorted = Object.entries(votes).sort((a,b) => b[1]-a[1]);
+    const max = sorted[0][1];
+    sorted.forEach(([subj, count]) => {
+        const pct = Math.round((count / max) * 100);
+        barsEl.innerHTML += `
+            <div class="score-row">
+                <span class="score-label">${subj}</span>
+                <div class="score-bar-bg">
+                    <div class="score-bar-fill" style="width:0%" data-pct="${pct}"></div>
+                </div>
+                <span class="score-count">${count}</span>
+            </div>`;
+    });
+    // Animate bars in after paint
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        document.querySelectorAll('.score-bar-fill').forEach(el => {
+            el.style.width = el.dataset.pct + '%';
+        });
+    }));
+}
+
+// Resources
+const list = document.getElementById('resources-list');
+data.items.forEach(item => {
+    list.innerHTML += `
+        <div class="resource-card">
+            <div class="resource-header">
+                <span class="resource-type">${item.type}</span>
+            </div>
+            <div class="resource-body">
+                <span class="resource-name">${item.name}</span>
+                <span class="resource-desc">${item.desc}</span>
+            </div>
+        </div>`;
+});
+</script>
+</body>
+</html>
