@@ -7,21 +7,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{min-height:100vh;background:#38167d;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Press Start 2P',monospace;padding:32px 20px}
-        .logo{font-family:'Bangers',cursive;font-size:clamp(2.5rem,6vw,4rem);color:#F7C948;letter-spacing:.08em;-webkit-text-stroke:2px #3A1E00;text-shadow:3px 3px 0 #3A1E00;margin-bottom:6px}
-        .subtitle{font-size:.6rem;color:rgba(200,180,255,.9);letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        body{min-height:100vh;background:#38167d;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Press Start 2P',monospace;padding:32px 20px;animation:fadeIn 0.35s ease}
+        .logo{font-family:'Bangers',cursive;font-size:clamp(2.5rem,6vw,4rem);color:#F7C948;letter-spacing:.08em;-webkit-text-stroke:2px #3A1E00;text-shadow:3px 3px 0 #3A1E00;margin-bottom:8px;font-style:italic}
+        .subtitle{font-size:.6rem;color:rgba(255,255,255,.7);letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
         .hint{font-size:.38rem;color:rgba(255,255,255,.4);letter-spacing:.15em;margin-bottom:28px}
         .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:clamp(300px,85vw,560px);margin-bottom:32px}
-        .card{background:#4a2090;border:3px solid #5a30a8;border-radius:18px;padding:20px 12px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:.15s;user-select:none;position:relative}
-        .card:hover{background:#5a30a8;border-color:#F7C948}
-        .card.on{background:#F7C948;border-color:#fff}
+        .card{background:#4a2090;border:2px solid rgba(255,255,255,0.12);border-radius:18px;padding:20px 12px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:.2s;user-select:none;position:relative}
+        .card:hover{background:#5a30a8;border-color:rgba(247,201,72,0.5);transform:translateY(-3px)}
+        .card.on{background:#F7C948;border-color:#F7C948;transform:translateY(-3px)}
         .card.on .name{color:#38167d}
         .tick{position:absolute;top:8px;right:10px;font-size:.9rem;opacity:0}
         .card.on .tick{opacity:1}
         .emoji{font-size:2.8rem;line-height:1}
         .name{font-size:.5rem;color:#fff;text-align:center;letter-spacing:.08em;text-transform:uppercase;line-height:1.6}
-        .go{font-family:'Press Start 2P',monospace;font-size:.7rem;color:#38167d;background:#F7C948;border:none;border-radius:14px;padding:16px 40px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase}
+        .go{font-family:'Press Start 2P',monospace;font-size:.7rem;color:#38167d;background:#F7C948;border:none;border-radius:14px;padding:16px 40px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;transition:background .15s,transform .1s}
         .go:hover{background:#ffe066}
+        .go:active{transform:scale(0.97)}
     </style>
 </head>
 <body>
@@ -31,6 +33,7 @@
 <div class="grid" id="grid"></div>
 <button class="go" onclick="go()">Continue</button>
 <script>
+if(!localStorage.getItem('isLoggedIn')){window.location.replace('Login Page.html');}
 const H=[
     {n:'Math',e:'🍎'},{n:'Science',e:'🍋'},{n:'Art',e:'🍉'},
     {n:'History',e:'🍊'},{n:'English',e:'🍋'},{n:'World Language',e:'🍇'},

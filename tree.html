@@ -7,11 +7,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { min-height:100vh; background-color:#38167d; font-family:'Press Start 2P',monospace; overflow:hidden; user-select:none; }
-        .nav { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; border-bottom:3px solid rgba(255,255,255,0.1); position:relative; z-index:20; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        body { min-height:100vh; background-color:#38167d; font-family:'Press Start 2P',monospace; overflow:hidden; user-select:none; animation:fadeIn 0.35s ease; }
+        .nav { display:flex; align-items:center; justify-content:space-between; padding:12px 24px; border-bottom:1px solid rgba(255,255,255,0.12); position:relative; z-index:20; background:rgba(0,0,0,0.15); backdrop-filter:blur(4px); }
         .logo { font-family:'Bangers',cursive; font-size:2rem; color:#F7C948; letter-spacing:0.08em; -webkit-text-stroke:1.5px #3A1E00; text-shadow:2px 2px 0 #3A1E00; }
         .book-btn { font-family:'Press Start 2P',monospace; font-size:0.45rem; color:#38167d; background:#F7C948; border:none; border-radius:10px; padding:10px 16px; cursor:pointer; }
         .book-btn:hover { background:#ffe066; }
+        .logout-btn { font-family:'Press Start 2P',monospace; font-size:0.45rem; color:rgba(255,255,255,0.5); background:none; border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:10px 16px; cursor:pointer; }
+        .logout-btn:hover { color:#fff; border-color:rgba(255,255,255,0.5); }
         .stage { position:relative; width:100%; height:calc(100vh - 62px); display:flex; align-items:center; justify-content:center; }
         canvas#tree-canvas { position:absolute; image-rendering:pixelated; }
         .node { position:absolute; cursor:pointer; transform:translate(-50%,-50%); z-index:10; }
@@ -53,7 +56,12 @@
 <body>
 <div class="nav">
     <span class="logo">PassionFruits</span>
-    <button class="book-btn" onclick="openBook()">📖 My Book</button>
+    <div style="display:flex;gap:10px;align-items:center;">
+        <button class="book-btn" onclick="window.location.href='profile.html'">👤 Profile</button>
+        <button class="book-btn" onclick="window.location.href='friends.html'">🌳 Friends</button>
+        <button class="book-btn" onclick="openBook()">📖 My Book</button>
+        <button class="logout-btn" onclick="logout()">Log Out</button>
+    </div>
 </div>
 <div class="stage" id="stage"><canvas id="tree-canvas"></canvas></div>
 <div class="overlay" id="overlay">
@@ -73,30 +81,21 @@
     </div>
 </div>
 <script>
+if(!localStorage.getItem('isLoggedIn')){window.location.replace('Login Page.html');}
+function logout(){localStorage.removeItem('isLoggedIn');window.location.href='Login Page.html';}
 const SUBJECT_EMOJI={'Math':'🍎','Science':'🍋','Art':'🍉','History':'🍊','English':'🍋','World Language':'🍇','Music':'🍓','Sports':'🍌','Extra-Curriculars':'🍍'};
-const ALL_ACTIVITIES={'Math':['Coding projects','Math olympiad prep','Chess club','Personal finance & budgeting','Puzzle & logic games'],'Science':['Science fair experiments','Stargazing & astronomy','Coding a game','Growing a plant from seed','DIY electronics & circuits'],'Art':['Sketchbook drawing','Digital art & design','Graphic novel making','Phone photography','Mural & street art'],'History':['Local history research','Museum visits','Documentary watching','Historical podcast listening','Family genealogy'],'English':['Fan fiction writing','Poetry writing','Starting a blog','Journaling daily','School newspaper'],'World Language':['Duolingo streaks','Listening to foreign music','Pen pal exchange','Watching subtitled anime','Cooking dishes from other cultures'],'Music':['Learning guitar','Producing beats','Joining a school choir','DJ-ing at school events','Songwriting & lyrics'],'Sports':['Recreational basketball','Skateboarding','Rock climbing gym','Yoga & stretching','Martial arts classes'],'Extra-Curriculars':['Student council','Debate team','Volunteering locally','Environmental club','Yearbook & school media']};
+// Activities match the suggestions shown on the Results page exactly
+const ALL_ACTIVITIES={'Math':['Khan Academy','Project Euler','3Blue1Brown','The Art of Problem Solving','Join a Math Olympiad'],'Science':['NASA Citizen Science','iNaturalist','Crash Course Science','Science Buddies','DIY Electronics'],'Art':['Procreate / Sketchbook','Ctrl+Paint','DeviantArt','Drawing on the Right Side of the Brain','Urban Sketching'],'History':['Crash Course History','Smithsonian Magazine','National Archives','Family Genealogy','Local Historical Society'],'English':['NaNoWriMo','Wattpad','The Moth','Bird by Bird – Anne Lamott','School Literary Magazine'],'World Language':['Duolingo','Tandem','FluentU','Pen Pal Exchange','Cook a Foreign Dish'],'Music':['Yousician','GarageBand / FL Studio','Adam Neely','School Band or Choir','Open Mic Night'],'Sports':['Nike Training Club','Athlean-X','Recreational League','Try a New Sport','TeamSnap / SportsEngine'],'Extra-Curriculars':['Student Council','Debate Team','VolunteerMatch','Model UN','Start a Club']};
+const ACTIVITY_DESC={'Khan Academy':'Free courses from basic arithmetic to university-level calculus.','Project Euler':'Hundreds of math puzzles that require a mix of maths and programming.','3Blue1Brown':'Beautiful visual explanations of advanced math concepts.','The Art of Problem Solving':'The go-to series for math competition prep and deep thinking.','Join a Math Olympiad':'AMC, MATHCOUNTS, and local competitions to sharpen your skills.','NASA Citizen Science':'Contribute to real NASA research projects from your browser.','iNaturalist':'Identify plants & animals and contribute to biodiversity data.','Crash Course Science':'Fast, fun overviews of biology, chemistry, physics, and more.','Science Buddies':'Step-by-step project guides for science fairs at every level.','DIY Electronics':'Start with an Arduino or Raspberry Pi kit and build your first circuit.','Procreate / Sketchbook':'Industry-standard drawing apps for tablets and phones.','Ctrl+Paint':'Free digital painting fundamentals taught step by step.','DeviantArt':'Share your work, get feedback, and find a creative community.','Drawing on the Right Side of the Brain':'The classic guide to learning how to really see and draw.','Urban Sketching':'Take a sketchbook outside and draw your neighbourhood — daily practice.','Crash Course History':'Entertaining deep-dives into world, US, and European history.','Smithsonian Magazine':'Accessible long-reads on history, science, and culture.','National Archives':'Explore primary sources and original historical documents.','Family Genealogy':'Use Ancestry or FamilySearch to trace your own family history.','Local Historical Society':'Volunteer or visit — every town has stories waiting to be found.','NaNoWriMo':'Write a novel in November — a global community of writers does it together.','Wattpad':'Publish your stories and read millions of others for free.','The Moth':'True stories told live — a masterclass in narrative structure.','Bird by Bird – Anne Lamott':'The most honest and encouraging guide to the writing life.','School Literary Magazine':'Submit your writing or join the editorial team.','Duolingo':'Daily streaks and gamified lessons for 40+ languages, free.','Tandem':'Practice with native speakers around the world via text and voice.','FluentU':'Learn through real-world videos — music, news, and movie clips.','Pen Pal Exchange':'Platforms like InterPals connect you with students worldwide.','Cook a Foreign Dish':'Cooking a dish in its cultural context is a full-immersion experience.','Yousician':'Learn guitar, piano, or ukulele through interactive lessons and songs.','GarageBand / FL Studio':'Free and affordable tools to start producing your own tracks.','Adam Neely':'Deep music theory explained in a way that actually makes sense.','School Band or Choir':'Performing with others builds skills no solo practice can.','Open Mic Night':'Local coffee shops and community centres host beginner-friendly events.','Nike Training Club':'Free workouts from beginner to elite, no equipment needed.','Athlean-X':'Science-backed fitness and athletic training for all levels.','Recreational League':'Local parks and rec departments run low-cost leagues for most sports.','Try a New Sport':'Rock climbing, martial arts, and ultimate frisbee are easy to start.','TeamSnap / SportsEngine':'Find local teams and sign-up opportunities near you.','Student Council':'Advocate for your school community and run real projects.','Debate Team':'Builds critical thinking, public speaking, and research skills fast.','VolunteerMatch':'Find local volunteer opportunities matched to your interests.','Model UN':'Research world issues and represent countries in a global simulation.','Start a Club':'If the right club does not exist at your school — start it.'};
 const FRUIT_PALS={'🍎':{'1':'#cc1111','2':'#1a7a1a','3':'#ff6666'},'🍋':{'1':'#ddcc00','2':'#1a7a1a','3':'#ffee66'},'🍉':{'1':'#cc2233','2':'#1a7a1a','3':'#ff6677'},'🍊':{'1':'#dd6600','2':'#1a7a1a','3':'#ffaa44'},'🍇':{'1':'#882299','2':'#1a7a1a','3':'#cc66ee'},'🍓':{'1':'#cc1133','2':'#1a7a1a','3':'#ff6688'},'🍌':{'1':'#ddbb00','2':'#1a7a1a','3':'#ffee44'},'🍍':{'1':'#cc8800','2':'#1a7a1a','3':'#ffcc44'}};
 const passion=localStorage.getItem('passion')||'Math';
 const emoji=SUBJECT_EMOJI[passion]||'🍎';
-const selected=JSON.parse(localStorage.getItem('selectedSubjects')||'null');
-const votes=JSON.parse(localStorage.getItem('votes')||'{}');
-// Build pool from all selected subjects, prioritising subjects with more votes
-const pool=(selected||[passion]).reduce(function(acc,s){return acc.concat(ALL_ACTIVITIES[s]||[]);} ,[]);
+// Pool = the exact 5 activities suggested on the Results page for this passion
+const pool=ALL_ACTIVITIES[passion]||[];
 let buds=JSON.parse(localStorage.getItem('pf_buds')||'null');
-if(!buds){
-    // Pick 3 activities spread across selected subjects
-    const subjects=selected||[passion];
-    const picked=[];
-    let si=0;
-    while(picked.length<3 && picked.length<pool.length){
-        const subj=subjects[si%subjects.length];
-        const acts=ALL_ACTIVITIES[subj]||[];
-        const act=acts.find(function(a){return !picked.find(function(p){return p.activity===a;});});
-        if(act) picked.push({id:picked.length,activity:act,subject:subj,stage:'bud'});
-        si++;
-        if(si>subjects.length*10) break;
-    }
-    buds=picked;
+// Reset buds if they belong to a different passion (e.g. user re-did the swipe)
+if(!buds||buds.some(function(b){return b.subject!==passion;})){
+    buds=pool.slice(0,3).map(function(act,i){return {id:i,activity:act,subject:passion,stage:'bud'};});
     localStorage.setItem('pf_buds',JSON.stringify(buds));
 }
 let bookEntries=JSON.parse(localStorage.getItem('pf_book')||'[]');
@@ -117,7 +116,7 @@ const NODE_POS_BIG=[[0.18,0.50],[0.50,0.06],[0.82,0.50]];
 function render(){const stage=document.getElementById('stage');const canvas=document.getElementById('tree-canvas');const stageW=stage.clientWidth;const stageH=stage.clientHeight;const allFruit=buds.every(b=>b.stage==="fruit");const grid=allFruit?BIG_TREE:SMALL_TREE;canvas.width=grid[0].length*PS;canvas.height=grid.length*PS;const scale=Math.min(stageW/canvas.width,stageH/canvas.height,2)*0.82;canvas.style.width=(canvas.width*scale)+'px';canvas.style.height=(canvas.height*scale)+'px';drawTree(canvas.getContext("2d"),allFruit);stage.querySelectorAll('.node').forEach(n=>n.remove());const dispW=canvas.width*scale;const dispH=canvas.height*scale;const offX=(stageW-dispW)/2;const offY=(stageH-dispH)/2;const positions=allFruit?NODE_POS_BIG:NODE_POS_SMALL;buds.forEach((bud,i)=>{const[xf,yf]=positions[i];const x=offX+xf*dispW;const y=offY+yf*dispH;const node=document.createElement('div');node.className='node';node.style.left=x+'px';node.style.top=y+'px';const nc=document.createElement('canvas');if(bud.stage==='bud')drawBudCanvas(nc);else drawFruitCanvas(nc,emoji);nc.style.width=(nc.width*scale*0.7)+'px';nc.style.height=(nc.height*scale*0.7)+'px';node.appendChild(nc);node.addEventListener('click',()=>openPopup(bud.id));stage.appendChild(node);});}
 function nextActivity(){const used=[...buds.map(b=>b.activity),...skipped];return pool.find(a=>!used.includes(a))||null;}
 let activeId=null;
-function openPopup(id){activeId=id;const bud=buds.find(b=>b.id===id);const btns=document.getElementById('pop-btns');document.getElementById('pop-emoji').textContent=bud.stage==='bud'?'🌱':emoji;document.getElementById('pop-title').textContent=bud.activity;btns.innerHTML='';if(bud.stage==='bud'){document.getElementById('pop-sub').textContent='Did you try this activity?';btns.appendChild(mkBtn('btn-yes','✓ Done it!',()=>markDone(id)));btns.appendChild(mkBtn('btn-skip','↩ Swap it',()=>skipActivity(id)));btns.appendChild(mkBtn('btn-no','✗ Not yet',closePopup));}else{document.getElementById('pop-sub').textContent='You completed this and grew a fruit!';btns.appendChild(mkBtn('btn-gold','🏆 Reward Info',()=>showInfo(bud)));btns.appendChild(mkBtn('btn-purple','🌱 New Branch',()=>newBranch(id)));}document.getElementById('overlay').classList.add('active');}
+function openPopup(id){activeId=id;const bud=buds.find(b=>b.id===id);const btns=document.getElementById('pop-btns');document.getElementById('pop-emoji').textContent=bud.stage==='bud'?'🌱':emoji;document.getElementById('pop-title').textContent=bud.activity;btns.innerHTML='';if(bud.stage==='bud'){document.getElementById('pop-sub').textContent=ACTIVITY_DESC[bud.activity]||'Did you try this activity?';btns.appendChild(mkBtn('btn-yes','✓ Done it!',()=>markDone(id)));btns.appendChild(mkBtn('btn-skip','↩ Swap it',()=>skipActivity(id)));btns.appendChild(mkBtn('btn-no','✗ Not yet',closePopup));}else{document.getElementById('pop-sub').textContent='You completed this and grew a fruit!';btns.appendChild(mkBtn('btn-gold','🏆 Reward Info',()=>showInfo(bud)));btns.appendChild(mkBtn('btn-purple','🌱 New Branch',()=>newBranch(id)));}document.getElementById('overlay').classList.add('active');}
 function mkBtn(cls,label,fn){const b=document.createElement('button');b.className=cls;b.textContent=label;b.onclick=fn;return b;}
 function closePopup(){document.getElementById('overlay').classList.remove('active');activeId=null;}
 function markDone(id){const bud=buds.find(b=>b.id===id);bud.stage='fruit';bookEntries.push({activity:bud.activity,subject:bud.subject,emoji});saveState();closePopup();render();}

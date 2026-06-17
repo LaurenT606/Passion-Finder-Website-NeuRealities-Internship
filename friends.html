@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PassionFruits – Friends Forest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        body {
+            min-height: 100vh;
+            background-color: #38167d;
+            animation: fadeIn 0.35s ease;
+            font-family: 'Press Start 2P', monospace;
+            padding: 22px 28px 28px;
+            overflow-y: auto;
+        }
+
+        /* ── Header ──────────────────────────────────────── */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 28px;
+        }
+
+        .title {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            color: #F7C948;
+            letter-spacing: 0.14em;
+            -webkit-text-stroke: 1px #3A1E00;
+            text-shadow: 3px 3px 0 #3A1E00;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5rem;
+            color: #F7C948;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .back-btn:hover { text-decoration: underline; }
+
+        .search-btn {
+            position: absolute;
+            right: 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #F7C948;
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        /* ── Grid ────────────────────────────────────────── */
+        .forest-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px 20px;
+        }
+
+        .friend-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+        }
+
+        .tree-frame {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 10px;
+            border-radius: 10px;
+            border: 3px solid transparent;
+            transition: border-color 0.15s;
+            width: 100%;
+            min-height: 180px;
+        }
+
+        .tree-frame.selected { border-color: #8855cc; }
+        .tree-frame:hover    { border-color: rgba(136, 85, 204, 0.5); }
+
+        .tree-frame canvas { image-rendering: pixelated; }
+
+        .name-pill {
+            background: #4a1fa8;
+            border-radius: 40px;
+            padding: 10px 26px;
+            font-family: 'Bangers', cursive;
+            font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+            color: #F7C948;
+            letter-spacing: 0.1em;
+            text-align: center;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <button class="back-btn" onclick="window.location.href='tree.html'">← Back</button>
+        <h1 class="title">FRIENDS FOREST</h1>
+        <button class="search-btn">🔍</button>
+    </div>
+
+    <div class="forest-grid" id="forest-grid"></div>
+
+<script>
+if(!localStorage.getItem('isLoggedIn')){window.location.replace('Login Page.html');}
+// ── Six distinct pixel-art tree designs ───────────────────────────────────
+const TREES = [
+    // 0: ROUND (Lauren / current user)
+    {
+        pal: {L:'#1a7a1a',M:'#22aa22',H:'#44cc44',S:'#aaff66',T:'#8B4513',b:'#6B3410',B:'#5C2A00'},
+        grid: [
+            '     LLLLLL     ',
+            '   LLMHHHMMLL   ',
+            '  LMHHSHHSHHML  ',
+            '  LMHHHHHHHML   ',
+            '   LLMMHHMML    ',
+            '     LLLLLL     ',
+            '       TT       ',
+            '      TbBT      ',
+            '     TTbBTT     ',
+            ' LLL TTbBT TLL  ',
+            'LMHL TTbBT LHML ',
+            'LMHL  TbT  LHML ',
+            ' LLL  TBT  LLL  ',
+            '       TbT      ',
+            '       TBT      ',
+            '       TbT      ',
+        ],
+        ps: 6,
+    },
+    // 1: TALL LAYERED (Kai)
+    {
+        pal: {L:'#146b14',M:'#1ea81e',H:'#3dcc3d',S:'#aaff66',h:'#88ee44',T:'#7B3A10',b:'#5C2A00',B:'#3d1a00'},
+        grid: [
+            '     LLLL      ',
+            '    LMHHML     ',
+            '   LMHShHML    ',
+            '   LMHhhHML    ',
+            '  LLMHHhHMLL   ',
+            '  LMMHHHHMMLl  ',
+            ' LLMMHHHHMMll  ',
+            '  LMMHHHHMll   ',
+            '   LLMHHMll    ',
+            '    LLLLll     ',
+            '      TT       ',
+            '     TbbT      ',
+            '    TTbbTT     ',
+            '    TbBBbT     ',
+            '    TbBBbT     ',
+            '    TTbBTT     ',
+            '     TbBT      ',
+            '      TbT      ',
+        ],
+        ps: 6,
+    },
+    // 2: ROUND (Noah) – slightly yellower greens
+    {
+        pal: {L:'#1a7a1a',M:'#33aa22',H:'#55cc33',S:'#ccff44',T:'#8B4513',b:'#6B3410',B:'#5C2A00'},
+        grid: [
+            '      LLLLLL      ',
+            '    LLMHHHMMLL    ',
+            '   LMHHSSSHHML    ',
+            '  LMHHHHHHHHMML   ',
+            '  LLMMHHHHHMMLl   ',
+            '   LLLMMHMMlll    ',
+            '     LLLLLLL      ',
+            '        TT        ',
+            '       TbBT       ',
+            '      TTbBTT      ',
+            '  LLL TTbBT TLL   ',
+            ' LMHL TTbBT LHML  ',
+            ' LMHL  TbT  LHML  ',
+            '  LLL  TBT  LLL   ',
+            '        TbT       ',
+        ],
+        ps: 5,
+    },
+    // 3: TRIANGULAR / POINTED (Ahaana)
+    {
+        pal: {L:'#1a8a1a',M:'#22bb22',H:'#55dd44',S:'#bbff55',T:'#9B4515',b:'#7B3210',B:'#5C2200'},
+        grid: [
+            '        LL        ',
+            '       LMML       ',
+            '      LMHHML      ',
+            '     LMHssHML     ',
+            '    LMHHssHHML    ',
+            '   LMHHHssHHHML   ',
+            '  LLMHHHHHHHMMLl  ',
+            '  LMMHHHHHHHMMll  ',
+            '   LLMMHHHHMMll   ',
+            '    LLLMMMMlll    ',
+            '       TTT        ',
+            '      TbBbT       ',
+            '     TTbBbTT      ',
+            '      TbBBbT      ',
+            '       TbBT       ',
+            '        TbT       ',
+        ],
+        ps: 5,
+    },
+    // 4: WIDE BUSHY (Sasha)
+    {
+        pal: {L:'#1a7a1a',M:'#28a828',H:'#44cc44',S:'#99ff44',T:'#8B4010',b:'#6B2e0e',B:'#4C1e00'},
+        grid: [
+            '   LLLLLLLLLL    ',
+            ' LLMHHHHHHHMLL   ',
+            'LMHHSSSHHSSHHML  ',
+            'LMHHHHHHHHHHHML  ',
+            'LMMHHHHHHHHHMMll ',
+            ' LLMMHHHHHMMll   ',
+            '  LLLMMMMMMlll   ',
+            '   LLLLLLLll     ',
+            '      TT         ',
+            '     TbbT        ',
+            '    TTbBTT       ',
+            '  L TTbBT L      ',
+            ' LML TTbT LML    ',
+            ' LML  TBT LML    ',
+            '  L   TbT  L     ',
+            '       TBT       ',
+        ],
+        ps: 5,
+    },
+    // 5: COMPACT ROUND (John)
+    {
+        pal: {L:'#1a7a14',M:'#22991e',H:'#3dbb3d',S:'#88ee44',T:'#7B3A10',b:'#5a2808',B:'#3a1800'},
+        grid: [
+            '    LLLLLL    ',
+            '  LLMMHHMLL   ',
+            ' LMHHSSHHMl   ',
+            ' LMHHHHHHMl   ',
+            ' LMHHHHHHMll  ',
+            ' LLMMHHMMll   ',
+            '  LLLLLLll    ',
+            '     TT       ',
+            '    TbbT      ',
+            '   TTbBTT     ',
+            ' L TTbBT L    ',
+            'LML TTbT LML  ',
+            'LML  TBT LML  ',
+            ' L   TBT  L   ',
+            '      TbT     ',
+        ],
+        ps: 6,
+    },
+];
+
+// ── Friend data ───────────────────────────────────────────────────────────
+// Slot 0 = current user (pulled from localStorage), rest are hardcoded friends
+const currentUser = localStorage.getItem('userName') || 'YOU';
+const friends = [
+    { name: currentUser, treeIdx: 0, selected: false },
+    { name: 'KAI',    treeIdx: 1, selected: false },
+    { name: 'NOAH',   treeIdx: 2, selected: true  },
+    { name: 'AHAANA', treeIdx: 3, selected: false },
+    { name: 'SASHA',  treeIdx: 4, selected: false },
+    { name: 'JOHN',   treeIdx: 5, selected: false },
+];
+
+// ── Render ────────────────────────────────────────────────────────────────
+function drawPixelTree(canvas, design) {
+    const { grid, pal, ps } = design;
+    const cols = Math.max(...grid.map(r => r.length));
+    canvas.width  = cols   * ps;
+    canvas.height = grid.length * ps;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    grid.forEach((row, r) => [...row].forEach((ch, c) => {
+        const col = pal[ch];
+        if (!col) return;
+        ctx.fillStyle = col;
+        ctx.fillRect(c * ps, r * ps, ps, ps);
+    }));
+}
+
+const grid = document.getElementById('forest-grid');
+
+friends.forEach((friend, i) => {
+    const slot = document.createElement('div');
+    slot.className = 'friend-slot';
+
+    const frame = document.createElement('div');
+    frame.className = 'tree-frame' + (friend.selected ? ' selected' : '');
+    frame.onclick = () => {
+        document.querySelectorAll('.tree-frame').forEach(f => f.classList.remove('selected'));
+        frame.classList.add('selected');
+    };
+
+    const canvas = document.createElement('canvas');
+    frame.appendChild(canvas);
+
+    const pill = document.createElement('div');
+    pill.className = 'name-pill';
+    pill.textContent = friend.name.toUpperCase();
+
+    slot.appendChild(frame);
+    slot.appendChild(pill);
+    grid.appendChild(slot);
+
+    drawPixelTree(canvas, TREES[friend.treeIdx]);
+});
+</script>
+</body>
+</html>
