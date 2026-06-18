@@ -22,6 +22,8 @@
         .stage { position:relative; width:100%; height:calc(100vh - 62px - 70px); display:flex; align-items:center; justify-content:center; }
         .footer-banner { display:flex; align-items:center; justify-content:space-around; height:70px; background:#F7C948; border-top:3px solid #3A1E00; padding:0 24px; }
         .footer-banner span { font-family:'Press Start 2P',monospace; color:#3C1FA8; letter-spacing:0.08em; text-transform:uppercase; font-size:clamp(0.7rem,2.2vw,1.1rem); text-shadow:1px 1px 0 rgba(58,30,0,0.15); }
+        .footer-banner span.clickable { cursor:pointer; transition:transform 0.15s; }
+        .footer-banner span.clickable:hover { transform:scale(1.05); text-decoration:underline; }
         #tree-img { image-rendering:pixelated; position:relative; z-index:1; max-height:78vh; max-width:90vw; }
         .node { position:absolute; cursor:pointer; transform:translate(-50%,-50%); z-index:10; display:flex; flex-direction:column; align-items:center; gap:2px; }
         .node canvas { image-rendering:pixelated; display:block; }
@@ -89,9 +91,6 @@
     <div class="nav-right">
         <button class="quilt-btn" onclick="openQuilt()"><img src="quilt_icon.png" alt="">The Quilt</button>
         <button class="book-btn" onclick="openBook()">📖 My Book</button>
-        <button class="book-btn" onclick="window.location.href='profile.html'" style="background:#5a30a8;color:#fff;">👤 Profile</button>
-        <button class="book-btn" onclick="window.location.href='orchard.html'" style="background:#5a30a8;color:#fff;">🌳 Friends</button>
-        <button class="book-btn" onclick="logout()" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);">Log Out</button>
     </div>
 </div>
 <div class="stage" id="stage">
@@ -105,7 +104,7 @@
 </div>
 <div class="footer-banner">
     <span>The Fruitbowl</span>
-    <span>Farmers Market</span>
+    <span class="clickable" onclick="window.location.href='farmers-market.html'">Farmers Market</span>
 </div>
 
 <div class="overlay" id="overlay">
