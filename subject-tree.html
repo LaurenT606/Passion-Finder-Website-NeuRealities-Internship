@@ -128,17 +128,19 @@ function markSubjectComplete() {
     localStorage.setItem('pf_subject_complete', JSON.stringify(done));
 }
 
-// Increments this subject's level exactly once per completion cycle.
-// Guarded with pf_level_counted so re-saving an already-complete subject
-// (e.g. a stray saveState call) never double-counts the level.
-function incrementLevel() {
-    const counted = JSON.parse(localStorage.getItem('pf_level_counted') || '{}');
-    if (counted[subject]) return;
-    const levels = JSON.parse(localStorage.getItem('pf_levels') || '{}');
-    levels[subject] = (levels[subject] || 0) + 1;
-    localStorage.setItem('pf_levels', JSON.stringify(levels));
-    counted[subject] = true;
-    localStorage.setItem('pf_level_counted', JSON.stringify(counted));
+// Leveling is now based on CUMULATIVE harvests, not "all 3 fruited at once" —
+// every 3 harvests (in any order, any timing) = +1 level for this subject.
+function recordHarvest() {
+    const harvestCounts = JSON.parse(localStorage.getItem('pf_harvest_counts') || '{}');
+    const newTotal = (harvestCounts[subject] || 0) + 1;
+    harvestCounts[subject] = newTotal;
+    localStorage.setItem('pf_harvest_counts', JSON.stringify(harvestCounts));
+
+    if (newTotal % 3 === 0) {
+        const levels = JSON.parse(localStorage.getItem('pf_levels') || '{}');
+        levels[subject] = (levels[subject] || 0) + 1;
+        localStorage.setItem('pf_levels', JSON.stringify(levels));
+    }
 }
 
 // Tracks every subject ever started, for the "passions discovered" stat —
@@ -156,7 +158,6 @@ function saveState() {
     localStorage.setItem(STORE_KEY, JSON.stringify(slots));
     if (slots.every(s=>s.stage==='fruit')) {
         markSubjectComplete();
-        incrementLevel();
     }
 }
 
@@ -330,6 +331,7 @@ function openPopup(id) {
             const area = document.getElementById('photo-area');
             area.innerHTML = '<img class="photo-preview" src="'+slot.photo+'" alt="activity photo" style="width:160px;height:120px;">';
         }
+        btns.appendChild(mkBtn('btn-yes','🧺 Harvest',()=>harvestSlot(id)));
         btns.appendChild(mkBtn('btn-gold','Nice! ✓',closePopup));
     }
     document.getElementById('overlay').classList.add('active');
@@ -374,6 +376,17 @@ function swapActivity(id) {
     const slot = slots.find(s=>s.id===id);
     slot.activity = freshActivity(id);
     slot.stage = 'bud';
+    saveState();
+    closePopup();
+    render();
+}
+
+function harvestSlot(id) {
+    const slot = slots.find(s=>s.id===id);
+    recordHarvest();
+    slot.activity = freshActivity(id);
+    slot.stage = 'bud';
+    delete slot.photo;
     saveState();
     closePopup();
     render();
