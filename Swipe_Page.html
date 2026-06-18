@@ -376,13 +376,10 @@ function shuffle(arr) {
     return a;
 }
 
-// Filter by selected subjects if stored, otherwise use all.
-// If swipeFilterOnly is set (from the tree's fruit basket), restrict to just those subjects for this round.
+// Filter by selected subjects if stored, otherwise use all
 function getActiveCards() {
-    const filterOnly = JSON.parse(localStorage.getItem('swipeFilterOnly') || 'null');
     const sel = JSON.parse(localStorage.getItem('selectedSubjects') || 'null');
-    const subjects = filterOnly && filterOnly.length ? filterOnly : sel;
-    const pool = subjects ? ALL_CARDS.filter(c => subjects.includes(c.subject)) : ALL_CARDS;
+    const pool = sel ? ALL_CARDS.filter(c => sel.includes(c.subject)) : ALL_CARDS;
     return shuffle(pool);
 }
 
@@ -483,29 +480,23 @@ function swipe(direction) {
 function finish() {
     const passion = Object.entries(votes).sort((a,b) => b[1]-a[1])[0];
     const winner  = passion ? passion[0] : 'Exploration';
+    localStorage.setItem('passion', winner);
+    localStorage.setItem('votes', JSON.stringify(votes));
 
-    const filterOnly = JSON.parse(localStorage.getItem('swipeFilterOnly') || 'null');
-
-    if (filterOnly && filterOnly.length) {
-        // This was a "fruit basket" add-on round: merge new buds into the existing tree
-        // rather than overwriting it, then go straight back to the tree.
-        const existingBuds = JSON.parse(localStorage.getItem('pf_buds') || '[]');
-        const keptSubjects = Object.keys(votes).length ? Object.keys(votes) : filterOnly;
-        let nextId = existingBuds.length ? Math.max(...existingBuds.map(b => b.id)) + 1 : 0;
-        keptSubjects.forEach(subj => {
-            const acts = ALL_CARDS.filter(c => c.subject === subj).map(c => c.activity);
-            const used = existingBuds.map(b => b.activity);
-            const act = acts.find(a => !used.includes(a)) || acts[0];
-            if (act) existingBuds.push({ id: nextId++, activity: act, subject: subj, stage: 'bud' });
-        });
-        localStorage.setItem('pf_buds', JSON.stringify(existingBuds));
-        localStorage.removeItem('swipeFilterOnly');
+    // Fruit-basket flow: this swipe round was a filtered add-on round
+    // triggered from the tree page, not the normal onboarding flow.
+    // Merge the newly-swiped subjects back into the full selected list
+    // and return straight to the tree instead of Results_Page.html.
+    if (localStorage.getItem('pf_basket_mode') === 'true') {
+        const base = JSON.parse(localStorage.getItem('pf_pending_merge_base') || '[]');
+        const added = JSON.parse(localStorage.getItem('selectedSubjects') || '[]');
+        const merged = [...new Set([...base, ...added])].slice(0, 9);
+        localStorage.setItem('selectedSubjects', JSON.stringify(merged));
+        localStorage.removeItem('pf_pending_merge_base');
+        localStorage.removeItem('pf_basket_mode');
         window.location.href = 'tree.html';
         return;
     }
-
-    localStorage.setItem('passion', winner);
-    localStorage.setItem('votes', JSON.stringify(votes));
 
     swipeScreen.style.display = 'none';
     doneScreen.style.display  = 'flex';

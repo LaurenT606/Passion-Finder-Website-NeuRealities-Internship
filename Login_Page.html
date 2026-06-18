@@ -8,11 +8,9 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
         body {
             min-height: 100vh;
-            background-color: #38167d;
-            animation: fadeIn 0.35s ease;
+            background-color: #3C1FA8;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -47,8 +45,7 @@
         .card {
             position: relative;
             z-index: 10;
-            background: #2a0e5e;
-            border: 2px solid rgba(247,201,72,0.25);
+            background: #3D1C0A;
             border-radius: 36px;
             padding: 48px 56px 40px;
             width: clamp(300px, 90vw, 460px);
@@ -83,7 +80,7 @@
 
         .form-group input {
             width: 100%;
-            background: #4a2090;
+            background: #5C2E0E;
             border: none;
             border-radius: 12px;
             padding: 14px 18px;
@@ -108,38 +105,23 @@
         .btn-primary {
             font-family: 'Press Start 2P', monospace;
             font-size: clamp(0.55rem, 1.2vw, 0.75rem);
-            color: #38167d;
-            background: #F7C948;
+            color: #FFFFFF;
+            background: transparent;
             border: none;
             cursor: pointer;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            padding: 12px 24px;
-            border-radius: 12px;
-            transition: background 0.15s, transform 0.1s;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: background 0.15s;
         }
 
-        .btn-primary:hover { background: #ffe066; }
+        .btn-primary:hover { background: rgba(255,255,255,0.1); }
         .btn-primary:active { transform: scale(0.97); }
-
-        .btn-secondary-login {
-            font-family: 'Press Start 2P', monospace;
-            font-size: clamp(0.55rem, 1.2vw, 0.75rem);
-            color: rgba(255,255,255,0.7);
-            background: transparent;
-            border: 2px solid rgba(255,255,255,0.25);
-            cursor: pointer;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            padding: 12px 24px;
-            border-radius: 12px;
-            transition: border-color 0.15s, color 0.15s;
-        }
-        .btn-secondary-login:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
 
         .divider {
             width: 1px;
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.2);
             align-self: stretch;
         }
 
@@ -180,11 +162,6 @@
         <p class="tagline">Find Your Passion</p>
 
         <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" placeholder="your name" autocomplete="name" />
-        </div>
-
-        <div class="form-group">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" />
         </div>
@@ -199,10 +176,10 @@
         <div class="btn-row">
             <button class="btn-primary" onclick="handleLogin()">Log In</button>
             <div class="divider"></div>
-            <button class="btn-secondary-login" onclick="handleSignup()">Sign Up</button>
+            <button class="btn-primary" onclick="window.location.href='Signup Page.html'">Sign Up</button>
         </div>
 
-        <button class="skip" onclick="localStorage.setItem('isLoggedIn','true');localStorage.setItem('userName','Guest');window.location.href='fruitbowl.html'">Skip for now</button>
+        <button class="skip" onclick="window.location.href='fruitbowl.html'">Skip for now</button>
     </div>
 
     <script>
@@ -345,33 +322,21 @@
         drawTree();
         window.addEventListener('resize', drawTree);
 
+        //  Login handler
         function handleLogin() {
-            const name     = document.getElementById('name').value.trim();
             const email    = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            if (!name || !email || !password) {
-                alert('Please fill in your name, email, and password.');
+            if (!email || !password) {
+                alert('Please enter your email and password.');
                 return;
             }
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userName', name);
-            localStorage.setItem('userEmail', email);
+            // Local-only account check (no real backend yet).
+            const account = JSON.parse(localStorage.getItem('pf_account') || 'null');
+            if (!account || account.username !== email || account.password !== password) {
+                alert("That doesn't match any account on this device. Try Sign Up, or Skip for now.");
+                return;
+            }
             window.location.href = 'Dashboard.html';
-        }
-
-        function handleSignup() {
-            const name     = document.getElementById('name').value.trim();
-            const email    = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            if (!name || !email || !password) {
-                alert('Please fill in your name, email, and password.');
-                return;
-            }
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userName', name);
-            localStorage.setItem('userEmail', email);
-            // New sign-ups always go to fruitbowl to pick passions
-            window.location.href = 'fruitbowl.html';
         }
     </script>
 </body>

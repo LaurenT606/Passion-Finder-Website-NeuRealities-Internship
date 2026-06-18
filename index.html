@@ -18,7 +18,7 @@
             padding: 20px 28px 24px;
         }
 
-        /*  Header*/
+        /* ── Header ──────────────────────────────────────────── */
         header {
             display: flex;
             align-items: flex-start;
@@ -72,7 +72,7 @@
             flex-shrink: 0;
         }
 
-        /* Cards  */
+        /* ── Cards ───────────────────────────────────────────── */
         .cards {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -127,7 +127,7 @@
             line-height: 1;
         }
 
-        /* Video player (card 2) */
+        /* ── Video player (card 2) ────────────────────────────── */
         .video-player {
             border: 3px solid #FFFFFF;
             border-radius: 14px;
@@ -189,7 +189,7 @@
 <body>
 
     <header>
-        <a id="login-btn" href="Login Page.html" class="login-btn">Login</a>
+        <a href="Login Page.html" class="login-btn">Login</a>
         <h1 class="site-title">PASSIONFRUITS</h1>
         <canvas id="pfruit" width="112" height="112"></canvas>
     </header>
@@ -335,7 +335,6 @@ const PF_GRID = [
     fruit(1,1,[[0,0,0,0,0,0,1,0],[0,2,2,0,2,2,1,0],[2,3,2,2,3,2,2,0],[2,2,2,2,2,2,2,0],[0,2,3,2,2,3,0,0],[0,2,2,2,2,2,0,0],[0,0,2,3,2,0,0,0],[0,0,2,2,2,0,0,0]],{1:'#503010',2:'#5020A0',3:'#7840C0'});
     fruit(2,1,[[1,0,1,0,1,0,0,0],[0,1,1,1,1,0,0,0],[1,2,3,2,2,2,0,0],[0,2,2,3,2,2,2,0],[0,2,3,2,2,2,2,0],[0,0,2,2,2,2,0,0],[0,0,0,2,2,0,0,0],[0,0,0,0,2,0,0,0]],{1:'#206010',2:'#B81818',3:'#E04040'});
 })();
-
 </script>
 </body>
 </html>

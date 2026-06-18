@@ -6,20 +6,27 @@
     <title>PassionFruits – Your Tree</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-        body { min-height:100vh; background-color:#38167d; font-family:'Press Start 2P',monospace; overflow:hidden; user-select:none; animation:fadeIn 0.35s ease; }
-        .nav { display:flex; align-items:center; justify-content:space-between; padding:12px 24px; border-bottom:1px solid rgba(255,255,255,0.12); position:relative; z-index:20; background:rgba(0,0,0,0.15); backdrop-filter:blur(4px); }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { min-height:100vh; background-color:#38167d; font-family:'Press Start 2P',monospace; overflow:hidden; user-select:none; }
+        .nav { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; border-bottom:3px solid rgba(255,255,255,0.1); position:relative; z-index:20; }
         .logo { font-family:'Bangers',cursive; font-size:2rem; color:#F7C948; letter-spacing:0.08em; -webkit-text-stroke:1.5px #3A1E00; text-shadow:2px 2px 0 #3A1E00; }
         .book-btn { font-family:'Press Start 2P',monospace; font-size:0.45rem; color:#38167d; background:#F7C948; border:none; border-radius:10px; padding:10px 16px; cursor:pointer; }
         .book-btn:hover { background:#ffe066; }
-        .logout-btn { font-family:'Press Start 2P',monospace; font-size:0.45rem; color:rgba(255,255,255,0.5); background:none; border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:10px 16px; cursor:pointer; }
-        .logout-btn:hover { color:#fff; border-color:rgba(255,255,255,0.5); }
-        .stage { position:relative; width:100%; height:calc(100vh - 62px); display:flex; align-items:center; justify-content:center; }
-        canvas#tree-canvas { position:absolute; image-rendering:pixelated; }
-        .node { position:absolute; cursor:pointer; transform:translate(-50%,-50%); z-index:10; }
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .quilt-btn { font-family:'Press Start 2P',monospace; font-size:0.45rem; color:#fff; background:#5a30a8; border:2px solid #F7C948; border-radius:10px; padding:9px 14px; cursor:pointer; display:flex; align-items:center; gap:8px; }
+        .quilt-btn:hover { background:#7a50c8; }
+        .quilt-btn img { width:18px; height:18px; image-rendering:pixelated; }
+        .orchard-btn { position:absolute; top:65%; right:6%; transform:translateY(-50%); background:none; border:none; cursor:pointer; padding:0; z-index:30; transition:transform 0.15s; }
+        .orchard-btn:hover { transform:translateY(-50%) scale(1.05); }
+        .orchard-btn img { width:min(22vw, 200px); height:auto; image-rendering:pixelated; }
+        .stage { position:relative; width:100%; height:calc(100vh - 62px - 70px); display:flex; align-items:center; justify-content:center; }
+        .footer-banner { display:flex; align-items:center; justify-content:space-around; height:70px; background:#F7C948; border-top:3px solid #3A1E00; padding:0 24px; }
+        .footer-banner span { font-family:'Press Start 2P',monospace; color:#3C1FA8; letter-spacing:0.08em; text-transform:uppercase; font-size:clamp(0.7rem,2.2vw,1.1rem); text-shadow:1px 1px 0 rgba(58,30,0,0.15); }
+        #tree-img { image-rendering:pixelated; position:relative; z-index:1; max-height:78vh; max-width:90vw; }
+        .node { position:absolute; cursor:pointer; transform:translate(-50%,-50%); z-index:10; display:flex; flex-direction:column; align-items:center; gap:2px; }
         .node canvas { image-rendering:pixelated; display:block; }
         .node:hover canvas { filter:brightness(1.4); }
+        .node-label { font-size:0.32rem; color:#fff; background:rgba(0,0,0,0.4); border-radius:6px; padding:3px 6px; letter-spacing:0.05em; text-transform:uppercase; white-space:nowrap; }
         .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:100; align-items:center; justify-content:center; }
         .overlay.active { display:flex; }
         .popup { background:#2a0e5e; border:4px solid #fff; border-radius:22px; padding:36px 40px; width:clamp(280px,90vw,440px); display:flex; flex-direction:column; align-items:center; gap:18px; position:relative; }
@@ -31,10 +38,6 @@
         .popup-btns { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:4px; }
         .btn-yes { font-family:'Press Start 2P',monospace; font-size:0.48rem; color:#1a4a1a; background:#44dd44; border:none; border-radius:10px; padding:12px 20px; cursor:pointer; }
         .btn-yes:hover { background:#66ff66; }
-        .btn-no { font-family:'Press Start 2P',monospace; font-size:0.48rem; color:#fff; background:#cc2222; border:none; border-radius:10px; padding:12px 20px; cursor:pointer; }
-        .btn-no:hover { background:#ff4444; }
-        .btn-skip { font-family:'Press Start 2P',monospace; font-size:0.48rem; color:#fff; background:#555; border:none; border-radius:10px; padding:12px 20px; cursor:pointer; }
-        .btn-skip:hover { background:#777; }
         .btn-gold { font-family:'Press Start 2P',monospace; font-size:0.48rem; color:#38167d; background:#F7C948; border:none; border-radius:10px; padding:12px 20px; cursor:pointer; }
         .btn-gold:hover { background:#ffe066; }
         .btn-purple { font-family:'Press Start 2P',monospace; font-size:0.48rem; color:#fff; background:#5a30a8; border:none; border-radius:10px; padding:12px 20px; cursor:pointer; }
@@ -42,28 +45,66 @@
         .book-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; align-items:center; justify-content:center; }
         .book-overlay.active { display:flex; }
         .book { background:#2a0e5e; border:4px solid #F7C948; border-radius:22px; padding:36px; width:clamp(300px,92vw,520px); max-height:80vh; overflow-y:auto; position:relative; }
-        .book-title { font-family:'Bangers',cursive; font-size:2rem; color:#F7C948; letter-spacing:0.1em; text-align:center; margin-bottom:24px; }
+        .book-title { font-family:'Bangers',cursive; font-size:2rem; color:#F7C948; letter-spacing:0.1em; text-align:center; margin-bottom:18px; }
+        .book-filters { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:20px; }
+        .book-filter-btn { font-family:'Press Start 2P',monospace; font-size:0.32rem; color:#fff; background:#4a2090; border:2px solid #5a30a8; border-radius:8px; padding:7px 10px; cursor:pointer; letter-spacing:0.05em; text-transform:uppercase; }
+        .book-filter-btn.on { background:#F7C948; border-color:#fff; color:#38167d; }
+        .book-filter-btn:hover { border-color:#F7C948; }
         .book-entry { border:2px solid rgba(255,255,255,0.2); border-radius:12px; padding:16px; margin-bottom:14px; display:flex; align-items:center; gap:16px; }
         .book-fruit { font-size:2rem; }
         .book-info { display:flex; flex-direction:column; gap:6px; }
         .book-activity { font-size:0.4rem; color:#F7C948; letter-spacing:0.08em; line-height:1.8; }
         .book-subject { font-size:0.33rem; color:rgba(255,255,255,0.5); letter-spacing:0.1em; text-transform:uppercase; }
         .book-empty { font-size:0.4rem; color:rgba(255,255,255,0.4); text-align:center; line-height:2.8; }
+        .quilt-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+        .quilt-patch { border:3px solid #5a30a8; border-radius:12px; overflow:hidden; cursor:pointer; position:relative; aspect-ratio:1; background:#4a2090; }
+        .quilt-patch:hover { border-color:#F7C948; }
+        .quilt-patch img { width:100%; height:100%; object-fit:cover; display:block; }
+        .quilt-patch-label { position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.6); font-size:0.26rem; color:#fff; padding:4px 6px; letter-spacing:0.05em; text-align:center; line-height:1.4; }
+        .lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:300; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
+        .lightbox.active { display:flex; }
+        .lightbox img { max-width:88vw; max-height:70vh; border-radius:14px; border:4px solid #F7C948; image-rendering:auto; }
+        .lightbox-caption { font-size:0.42rem; color:#F7C948; text-align:center; letter-spacing:0.08em; }
+        .lightbox-sub { font-size:0.34rem; color:rgba(255,255,255,0.6); text-align:center; letter-spacing:0.07em; }
         .book-close { position:absolute; top:14px; right:18px; background:none; border:none; color:rgba(255,255,255,0.4); font-size:0.9rem; cursor:pointer; font-family:'Press Start 2P',monospace; }
         .book-close:hover { color:#fff; }
+        .basket-btn { position:absolute; top:90%; left:40%; transform:translateY(-50%); background:transparent; border:none; cursor:pointer; z-index:30; transition:transform 0.15s; padding:0; }
+        .basket-btn:hover { transform:translateY(-50%) scale(1.05); }
+        .basket-btn img { display:block; width:min(45vw, 400px); height:auto; }
+        .add-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; max-height:50vh; overflow-y:auto; }
+        .add-card { background:#4a2090; border:3px solid #5a30a8; border-radius:14px; padding:14px 8px 10px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; transition:.15s; position:relative; }
+        .add-card:hover { background:#5a30a8; border-color:#F7C948; }
+        .add-card.on { background:#F7C948; border-color:#fff; }
+        .add-card.on .add-name { color:#38167d; }
+        .add-card.disabled { opacity:0.35; cursor:not-allowed; }
+        .add-tick { position:absolute; top:5px; right:7px; font-size:0.6rem; opacity:0; }
+        .add-card.on .add-tick { opacity:1; }
+        .add-emoji { font-size:1.8rem; line-height:1; }
+        .add-name { font-size:0.32rem; color:#fff; text-align:center; letter-spacing:0.06em; text-transform:uppercase; line-height:1.5; }
     </style>
 </head>
 <body>
 <div class="nav">
     <span class="logo">PassionFruits</span>
-    <div style="display:flex;gap:10px;align-items:center;">
-        <button class="book-btn" onclick="window.location.href='profile.html'">👤 Profile</button>
-        <button class="book-btn" onclick="window.location.href='friends.html'">🌳 Friends</button>
+    <div class="nav-right">
+        <button class="quilt-btn" onclick="openQuilt()"><img src="quilt_icon.png" alt="">The Quilt</button>
         <button class="book-btn" onclick="openBook()">📖 My Book</button>
-        <button class="logout-btn" onclick="logout()">Log Out</button>
     </div>
 </div>
-<div class="stage" id="stage"><canvas id="tree-canvas"></canvas></div>
+<div class="stage" id="stage">
+    <img id="tree-img" src="tree_big.png" alt="your tree">
+    <div class="basket-btn" onclick="openBasket()" title="Add more passions">
+        <img id="basket-img" src="basket.png" alt="Fruit basket - add more passions">
+    </div>
+    <button class="orchard-btn" onclick="window.location.href='orchard.html'" title="Visit The Orchard">
+        <img src="signpost.png" alt="The Orchard">
+    </button>
+</div>
+<div class="footer-banner">
+    <span>The Fruitbowl</span>
+    <span>Farmers Market</span>
+</div>
+
 <div class="overlay" id="overlay">
     <div class="popup">
         <button class="popup-close" onclick="closePopup()">✕</button>
@@ -73,61 +114,244 @@
         <div class="popup-btns" id="pop-btns"></div>
     </div>
 </div>
+
 <div class="book-overlay" id="book-overlay">
     <div class="book">
         <button class="book-close" onclick="closeBook()">✕</button>
         <div class="book-title">📖 My Book</div>
+        <div class="book-filters" id="book-filters"></div>
         <div id="book-entries"></div>
     </div>
 </div>
+
+<div class="book-overlay" id="quilt-overlay">
+    <div class="book">
+        <button class="book-close" onclick="closeQuilt()">✕</button>
+        <div class="book-title">🧵 The Quilt</div>
+        <p class="popup-sub" style="margin-bottom:18px;">Photos from your completed activities</p>
+        <div id="quilt-entries"></div>
+    </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="">
+    <p class="lightbox-caption" id="lightbox-caption"></p>
+    <p class="lightbox-sub" id="lightbox-sub"></p>
+</div>
+
+<div class="book-overlay" id="basket-overlay">
+    <div class="book">
+        <button class="book-close" onclick="closeBasket()">✕</button>
+        <div class="book-title">🧺 Add Passions</div>
+        <p class="popup-sub" style="margin-bottom:18px;">Pick more subjects to grow new fruit</p>
+        <div class="add-grid" id="add-grid"></div>
+        <div class="popup-btns" style="margin-top:20px;">
+            <button class="btn-gold" onclick="confirmBasket()">Add &amp; Swipe →</button>
+        </div>
+    </div>
+</div>
+
 <script>
-if(!localStorage.getItem('isLoggedIn')){window.location.replace('Login Page.html');}
-function logout(){localStorage.removeItem('isLoggedIn');window.location.href='index.html';}
 const SUBJECT_EMOJI={'Math':'🍎','Science':'🍋','Art':'🍉','History':'🍊','English':'🍋','World Language':'🍇','Music':'🍓','Sports':'🍌','Extra-Curriculars':'🍍'};
-// Activities match the suggestions shown on the Results page exactly
-const ALL_ACTIVITIES={'Math':['Khan Academy','Project Euler','3Blue1Brown','The Art of Problem Solving','Join a Math Olympiad'],'Science':['NASA Citizen Science','iNaturalist','Crash Course Science','Science Buddies','DIY Electronics'],'Art':['Procreate / Sketchbook','Ctrl+Paint','DeviantArt','Drawing on the Right Side of the Brain','Urban Sketching'],'History':['Crash Course History','Smithsonian Magazine','National Archives','Family Genealogy','Local Historical Society'],'English':['NaNoWriMo','Wattpad','The Moth','Bird by Bird – Anne Lamott','School Literary Magazine'],'World Language':['Duolingo','Tandem','FluentU','Pen Pal Exchange','Cook a Foreign Dish'],'Music':['Yousician','GarageBand / FL Studio','Adam Neely','School Band or Choir','Open Mic Night'],'Sports':['Nike Training Club','Athlean-X','Recreational League','Try a New Sport','TeamSnap / SportsEngine'],'Extra-Curriculars':['Student Council','Debate Team','VolunteerMatch','Model UN','Start a Club']};
-const ACTIVITY_DESC={'Khan Academy':'Free courses from basic arithmetic to university-level calculus.','Project Euler':'Hundreds of math puzzles that require a mix of maths and programming.','3Blue1Brown':'Beautiful visual explanations of advanced math concepts.','The Art of Problem Solving':'The go-to series for math competition prep and deep thinking.','Join a Math Olympiad':'AMC, MATHCOUNTS, and local competitions to sharpen your skills.','NASA Citizen Science':'Contribute to real NASA research projects from your browser.','iNaturalist':'Identify plants & animals and contribute to biodiversity data.','Crash Course Science':'Fast, fun overviews of biology, chemistry, physics, and more.','Science Buddies':'Step-by-step project guides for science fairs at every level.','DIY Electronics':'Start with an Arduino or Raspberry Pi kit and build your first circuit.','Procreate / Sketchbook':'Industry-standard drawing apps for tablets and phones.','Ctrl+Paint':'Free digital painting fundamentals taught step by step.','DeviantArt':'Share your work, get feedback, and find a creative community.','Drawing on the Right Side of the Brain':'The classic guide to learning how to really see and draw.','Urban Sketching':'Take a sketchbook outside and draw your neighbourhood — daily practice.','Crash Course History':'Entertaining deep-dives into world, US, and European history.','Smithsonian Magazine':'Accessible long-reads on history, science, and culture.','National Archives':'Explore primary sources and original historical documents.','Family Genealogy':'Use Ancestry or FamilySearch to trace your own family history.','Local Historical Society':'Volunteer or visit — every town has stories waiting to be found.','NaNoWriMo':'Write a novel in November — a global community of writers does it together.','Wattpad':'Publish your stories and read millions of others for free.','The Moth':'True stories told live — a masterclass in narrative structure.','Bird by Bird – Anne Lamott':'The most honest and encouraging guide to the writing life.','School Literary Magazine':'Submit your writing or join the editorial team.','Duolingo':'Daily streaks and gamified lessons for 40+ languages, free.','Tandem':'Practice with native speakers around the world via text and voice.','FluentU':'Learn through real-world videos — music, news, and movie clips.','Pen Pal Exchange':'Platforms like InterPals connect you with students worldwide.','Cook a Foreign Dish':'Cooking a dish in its cultural context is a full-immersion experience.','Yousician':'Learn guitar, piano, or ukulele through interactive lessons and songs.','GarageBand / FL Studio':'Free and affordable tools to start producing your own tracks.','Adam Neely':'Deep music theory explained in a way that actually makes sense.','School Band or Choir':'Performing with others builds skills no solo practice can.','Open Mic Night':'Local coffee shops and community centres host beginner-friendly events.','Nike Training Club':'Free workouts from beginner to elite, no equipment needed.','Athlean-X':'Science-backed fitness and athletic training for all levels.','Recreational League':'Local parks and rec departments run low-cost leagues for most sports.','Try a New Sport':'Rock climbing, martial arts, and ultimate frisbee are easy to start.','TeamSnap / SportsEngine':'Find local teams and sign-up opportunities near you.','Student Council':'Advocate for your school community and run real projects.','Debate Team':'Builds critical thinking, public speaking, and research skills fast.','VolunteerMatch':'Find local volunteer opportunities matched to your interests.','Model UN':'Research world issues and represent countries in a global simulation.','Start a Club':'If the right club does not exist at your school — start it.'};
 const FRUIT_PALS={'🍎':{'1':'#cc1111','2':'#1a7a1a','3':'#ff6666'},'🍋':{'1':'#ddcc00','2':'#1a7a1a','3':'#ffee66'},'🍉':{'1':'#cc2233','2':'#1a7a1a','3':'#ff6677'},'🍊':{'1':'#dd6600','2':'#1a7a1a','3':'#ffaa44'},'🍇':{'1':'#882299','2':'#1a7a1a','3':'#cc66ee'},'🍓':{'1':'#cc1133','2':'#1a7a1a','3':'#ff6688'},'🍌':{'1':'#ddbb00','2':'#1a7a1a','3':'#ffee44'},'🍍':{'1':'#cc8800','2':'#1a7a1a','3':'#ffcc44'}};
-const passion=localStorage.getItem('passion')||'Math';
-const emoji=SUBJECT_EMOJI[passion]||'🍎';
-// Pool = the exact 5 activities suggested on the Results page for this passion
-const pool=ALL_ACTIVITIES[passion]||[];
-let buds=JSON.parse(localStorage.getItem('pf_buds')||'null');
-// Reset buds if they belong to a different passion (e.g. user re-did the swipe)
-if(!buds||buds.some(function(b){return b.subject!==passion;})){
-    buds=pool.slice(0,3).map(function(act,i){return {id:i,activity:act,subject:passion,stage:'bud'};});
-    localStorage.setItem('pf_buds',JSON.stringify(buds));
+const ALL_SUBJECTS = Object.keys(SUBJECT_EMOJI);
+
+const passion = localStorage.getItem('passion') || 'Math';
+let selected = JSON.parse(localStorage.getItem('selectedSubjects') || 'null') || [passion];
+
+// Safety net: if we land on tree.html while a basket round was in
+// progress (regardless of how the swipe page was exited), merge the
+// stashed base list back in now so subjects never get lost.
+if (localStorage.getItem('pf_basket_mode') === 'true') {
+    const base = JSON.parse(localStorage.getItem('pf_pending_merge_base') || '[]');
+    const merged = [...new Set([...base, ...selected])].slice(0, 9);
+    selected = merged;
+    localStorage.setItem('selectedSubjects', JSON.stringify(merged));
+    localStorage.removeItem('pf_pending_merge_base');
+    localStorage.removeItem('pf_basket_mode');
 }
-let bookEntries=JSON.parse(localStorage.getItem('pf_book')||'[]');
-let skipped=JSON.parse(localStorage.getItem('pf_skipped')||'[]');
-const PS=14;
-const SMALL_PAL={T:'#8B4513',b:'#6B3410',B:'#5C2A00',L:'#1a7a1a',M:'#22aa22',H:'#44cc44',S:'#aaff66'};
-const SMALL_TREE=['      LLLLLL      ','    LLMHHHMMLL    ','   LMHHSHHSHHML   ','   LMHHHHHHHML    ','    LLMMHHMML     ','      LLLLLL      ','        TT        ','       TbBT       ','      TTbBTT      ','  LLL TTbBT TLL   ',' LMHL TTbBT LHML  ',' LMHL  TbT  LHML  ','  LLL  TBT  LLL   ','        TbT       ','        TBT       ','        TbT       '];
-const BIG_PAL={T:'#8B4513',b:'#6B3410',B:'#5C2A00',L:'#146b14',M:'#22aa22',H:'#44cc44',h:'#66ee44',S:'#aaff66'};
-const BIG_TREE=['         LLLLLLL         ','      LLMMMHHHMMLL       ','    LLMHHSSSHHSSSHMLL    ','   LMHHHSSSHHHSSSHHHMLL  ','  LMHHHSSSHHHHHSSSHHHMLl ','  LMHHHHHHHHHHHHHHHHMll  ',' LLMHHHHHHHHHHHHHHHMMLl  ',' LMMHHHHhhhHHHHhhhHHMML  ',' LMMHHHHHHHHHHHHHHHMMLl  ','  LMHHHHHHHHHHHHHHHMLl   ','  LLMMHHHHHHHHHHHHMMLl   ','   LLMMMHHHHHHHHMMMll    ','    LLLMMMMMMMMMMLl      ','      LLLLLLLLLl         ','          TTT            ','         TbBbT           ','        TTbBbTT          ','        TbBBBbT          ','       TTbBBBbTT         ','       TbBBBBBbT         ','        TbBBBbT          ','         TbBbT           ','          TbT            ','          TBT            ','          TbT            '];
-function drawTree(ctx,big){const grid=big?BIG_TREE:SMALL_TREE;const pal=big?BIG_PAL:SMALL_PAL;ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);grid.forEach((row,r)=>[...row].forEach((ch,c)=>{const col=pal[ch];if(!col)return;ctx.fillStyle=col;ctx.fillRect(c*PS,r*PS,PS,PS);}));}
+
+// ── Per-subject completion map (set by subject-tree.html) ────────
+function getCompleteMap() { return JSON.parse(localStorage.getItem('pf_subject_complete') || '{}'); }
+
+// ── Node layout around the big tree canopy, up to 9 slots ────────
+// Fractions of the displayed tree image's bounding box
+const NODE_LAYOUTS = {
+    1: [[0.50,0.30]],
+    2: [[0.35,0.32],[0.65,0.32]],
+    3: [[0.50,0.12],[0.28,0.40],[0.72,0.40]],
+    4: [[0.30,0.18],[0.70,0.18],[0.22,0.46],[0.78,0.46]],
+    5: [[0.50,0.10],[0.26,0.26],[0.74,0.26],[0.18,0.50],[0.82,0.50]],
+    6: [[0.30,0.12],[0.70,0.12],[0.16,0.34],[0.84,0.34],[0.30,0.54],[0.70,0.54]],
+    7: [[0.50,0.08],[0.28,0.20],[0.72,0.20],[0.14,0.40],[0.86,0.40],[0.32,0.56],[0.68,0.56]],
+    8: [[0.36,0.08],[0.64,0.08],[0.18,0.24],[0.82,0.24],[0.10,0.44],[0.90,0.44],[0.30,0.58],[0.70,0.58]],
+    9: [[0.50,0.06],[0.30,0.14],[0.70,0.14],[0.14,0.30],[0.86,0.30],[0.10,0.50],[0.90,0.50],[0.32,0.58],[0.68,0.58]],
+};
+
 const BUD_PAL={'1':'#0d5c0d','2':'#22aa22','3':'#aaff66','4':'#5C2A00'};
 const BUD_GRID=['00111000','01222100','12233210','12333210','01222100','00141000','00040000','00040000'];
 const FRUIT_BASE=['00010000','00020000','01111100','13111110','11111110','11111110','01111100','00111000'];
-function drawBudCanvas(canvas){const ps=7;canvas.width=8*ps;canvas.height=8*ps;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);BUD_GRID.forEach((row,r)=>[...row].forEach((ch,c)=>{const col=BUD_PAL[ch];if(!col)return;ctx.fillStyle=col;ctx.fillRect(c*ps,r*ps,ps,ps);}));}
-function drawFruitCanvas(canvas,em){const ps=7;canvas.width=8*ps;canvas.height=8*ps;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);const pal=FRUIT_PALS[em]||FRUIT_PALS['🍎'];FRUIT_BASE.forEach((row,r)=>[...row].forEach((ch,c)=>{const col=pal[ch];if(!col)return;ctx.fillStyle=col;ctx.fillRect(c*ps,r*ps,ps,ps);}));}
-const NODE_POS_SMALL=[[0.15,0.62],[0.50,0.10],[0.85,0.62]];
-const NODE_POS_BIG=[[0.18,0.50],[0.50,0.06],[0.82,0.50]];
-function render(){const stage=document.getElementById('stage');const canvas=document.getElementById('tree-canvas');const stageW=stage.clientWidth;const stageH=stage.clientHeight;const allFruit=buds.every(b=>b.stage==="fruit");const grid=allFruit?BIG_TREE:SMALL_TREE;canvas.width=grid[0].length*PS;canvas.height=grid.length*PS;const scale=Math.min(stageW/canvas.width,stageH/canvas.height,2)*0.82;canvas.style.width=(canvas.width*scale)+'px';canvas.style.height=(canvas.height*scale)+'px';drawTree(canvas.getContext("2d"),allFruit);stage.querySelectorAll('.node').forEach(n=>n.remove());const dispW=canvas.width*scale;const dispH=canvas.height*scale;const offX=(stageW-dispW)/2;const offY=(stageH-dispH)/2;const positions=allFruit?NODE_POS_BIG:NODE_POS_SMALL;buds.forEach((bud,i)=>{const[xf,yf]=positions[i];const x=offX+xf*dispW;const y=offY+yf*dispH;const node=document.createElement('div');node.className='node';node.style.left=x+'px';node.style.top=y+'px';const nc=document.createElement('canvas');if(bud.stage==='bud')drawBudCanvas(nc);else drawFruitCanvas(nc,emoji);nc.style.width=(nc.width*scale*0.7)+'px';nc.style.height=(nc.height*scale*0.7)+'px';node.appendChild(nc);node.addEventListener('click',()=>openPopup(bud.id));stage.appendChild(node);});}
-function nextActivity(){const used=[...buds.map(b=>b.activity),...skipped];return pool.find(a=>!used.includes(a))||null;}
-let activeId=null;
-function openPopup(id){activeId=id;const bud=buds.find(b=>b.id===id);const btns=document.getElementById('pop-btns');document.getElementById('pop-emoji').textContent=bud.stage==='bud'?'🌱':emoji;document.getElementById('pop-title').textContent=bud.activity;btns.innerHTML='';if(bud.stage==='bud'){document.getElementById('pop-sub').textContent=ACTIVITY_DESC[bud.activity]||'Did you try this activity?';btns.appendChild(mkBtn('btn-yes','✓ Done it!',()=>markDone(id)));btns.appendChild(mkBtn('btn-skip','↩ Swap it',()=>skipActivity(id)));btns.appendChild(mkBtn('btn-no','✗ Not yet',closePopup));}else{document.getElementById('pop-sub').textContent='You completed this and grew a fruit!';btns.appendChild(mkBtn('btn-gold','🏆 Reward Info',()=>showInfo(bud)));btns.appendChild(mkBtn('btn-purple','🌱 New Branch',()=>newBranch(id)));}document.getElementById('overlay').classList.add('active');}
-function mkBtn(cls,label,fn){const b=document.createElement('button');b.className=cls;b.textContent=label;b.onclick=fn;return b;}
-function closePopup(){document.getElementById('overlay').classList.remove('active');activeId=null;}
-function markDone(id){const bud=buds.find(b=>b.id===id);bud.stage='fruit';bookEntries.push({activity:bud.activity,subject:bud.subject,emoji});saveState();closePopup();render();}
-function skipActivity(id){const bud=buds.find(b=>b.id===id);skipped.push(bud.activity);const next=nextActivity();if(next){bud.activity=next;}else{skipped=[];const used=buds.map(b=>b.activity);bud.activity=pool.find(a=>!used.includes(a))||pool[0];}saveState();closePopup();render();}
-function showInfo(bud){document.getElementById('pop-emoji').textContent='🏆';document.getElementById('pop-title').textContent='Reward Earned!';document.getElementById('pop-sub').textContent='You completed "'+bud.activity+'" in '+bud.subject+'. Keep it up!';const btns=document.getElementById('pop-btns');btns.innerHTML='';btns.appendChild(mkBtn('btn-gold','Nice! ✓',closePopup));}
-function newBranch(id){const bud=buds.find(b=>b.id===id);const next=nextActivity();if(next){bud.activity=next;bud.stage='bud';}else{skipped=[];const used=buds.filter(b=>b.id!==id).map(b=>b.activity);bud.activity=pool.find(a=>!used.includes(a))||pool[0];bud.stage='bud';}saveState();closePopup();render();}
-function openBook(){const el=document.getElementById('book-entries');el.innerHTML=bookEntries.length===0?'<p class="book-empty">No fruits yet.<br>Complete an activity<br>to grow your first fruit! 🌱</p>':bookEntries.map(e=>'<div class="book-entry"><span class="book-fruit">'+e.emoji+'</span><div class="book-info"><span class="book-activity">'+e.activity+'</span><span class="book-subject">'+e.subject+'</span></div></div>').join('');document.getElementById('book-overlay').classList.add('active');}
-function closeBook(){document.getElementById('book-overlay').classList.remove('active');}
-function saveState(){localStorage.setItem('pf_buds',JSON.stringify(buds));localStorage.setItem('pf_book',JSON.stringify(bookEntries));localStorage.setItem('pf_skipped',JSON.stringify(skipped));}
-window.addEventListener('resize',render);
+function drawBudCanvas(canvas){const ps=6;canvas.width=8*ps;canvas.height=8*ps;const ctx=canvas.getContext('2d');BUD_GRID.forEach((row,r)=>[...row].forEach((ch,c)=>{const col=BUD_PAL[ch];if(!col)return;ctx.fillStyle=col;ctx.fillRect(c*ps,r*ps,ps,ps);}));}
+function drawFruitCanvas(canvas,em){const ps=6;canvas.width=8*ps;canvas.height=8*ps;const ctx=canvas.getContext('2d');const pal=FRUIT_PALS[em]||FRUIT_PALS['🍎'];FRUIT_BASE.forEach((row,r)=>[...row].forEach((ch,c)=>{const col=pal[ch];if(!col)return;ctx.fillStyle=col;ctx.fillRect(c*ps,r*ps,ps,ps);}));}
+
+function render() {
+    const stage = document.getElementById('stage');
+    const img = document.getElementById('tree-img');
+    stage.querySelectorAll('.node').forEach(n=>n.remove());
+
+    const rect = img.getBoundingClientRect();
+    const stageRect = stage.getBoundingClientRect();
+    const offX = rect.left - stageRect.left;
+    const offY = rect.top - stageRect.top;
+
+    const count = Math.min(selected.length, 9);
+    const positions = NODE_LAYOUTS[count] || NODE_LAYOUTS[9];
+    const completeMap = getCompleteMap();
+
+    selected.slice(0,9).forEach((subj, i) => {
+        const [xf, yf] = positions[i];
+        const x = offX + xf * rect.width;
+        const y = offY + yf * rect.height;
+        const node = document.createElement('div');
+        node.className = 'node';
+        node.style.left = x + 'px';
+        node.style.top = y + 'px';
+
+        const nc = document.createElement('canvas');
+        const isComplete = !!completeMap[subj];
+        if (isComplete) drawFruitCanvas(nc, SUBJECT_EMOJI[subj]||'🍎');
+        else drawBudCanvas(nc);
+        nc.style.width = '30px'; nc.style.height = '30px';
+        node.appendChild(nc);
+
+        const label = document.createElement('div');
+        label.className = 'node-label';
+        label.textContent = subj;
+        node.appendChild(label);
+
+        node.addEventListener('click', () => {
+            if (isComplete) showRewardInfo(subj);
+            else window.location.href = 'subject-tree.html?subject=' + encodeURIComponent(subj);
+        });
+        stage.appendChild(node);
+    });
+}
+
+function mkBtn(cls, label, fn) { const b=document.createElement('button'); b.className=cls; b.textContent=label; b.onclick=fn; return b; }
+
+function showRewardInfo(subj) {
+    document.getElementById('pop-emoji').textContent = '🏆';
+    document.getElementById('pop-title').textContent = subj + ' Complete!';
+    document.getElementById('pop-sub').textContent = "You've grown every fruit in " + subj + ". Amazing work!";
+    const btns = document.getElementById('pop-btns');
+    btns.innerHTML = '';
+    btns.appendChild(mkBtn('btn-purple','🌳 Visit Tree',()=>{window.location.href='subject-tree.html?subject='+encodeURIComponent(subj);}));
+    btns.appendChild(mkBtn('btn-gold','Nice! ✓',closePopup));
+    document.getElementById('overlay').classList.add('active');
+}
+
+function closePopup() { document.getElementById('overlay').classList.remove('active'); }
+
+// ── My Book (now filterable by subject) ───────────────────────
+let bookFilter = null;
+function openBook() {
+    const bookEntries = JSON.parse(localStorage.getItem('pf_book') || '[]');
+    const subjectsInBook = [...new Set(bookEntries.map(e=>e.subject))];
+
+    const filtersEl = document.getElementById('book-filters');
+    filtersEl.innerHTML = '';
+    if (subjectsInBook.length > 1) {
+        const allBtn = document.createElement('button');
+        allBtn.className = 'book-filter-btn' + (bookFilter===null ? ' on' : '');
+        allBtn.textContent = 'All';
+        allBtn.onclick = () => { bookFilter = null; openBook(); };
+        filtersEl.appendChild(allBtn);
+        subjectsInBook.forEach(s => {
+            const b = document.createElement('button');
+            b.className = 'book-filter-btn' + (bookFilter===s ? ' on' : '');
+            b.textContent = s;
+            b.onclick = () => { bookFilter = s; openBook(); };
+            filtersEl.appendChild(b);
+        });
+    }
+
+    const shown = bookFilter ? bookEntries.filter(e=>e.subject===bookFilter) : bookEntries;
+    const el = document.getElementById('book-entries');
+    el.innerHTML = shown.length===0
+        ? '<p class="book-empty">No fruits yet.<br>Complete an activity<br>to grow your first fruit! 🌱</p>'
+        : shown.map(e=>'<div class="book-entry"><span class="book-fruit">'+e.emoji+'</span><div class="book-info"><span class="book-activity">'+e.activity+'</span><span class="book-subject">'+e.subject+'</span></div></div>').join('');
+    document.getElementById('book-overlay').classList.add('active');
+}
+function closeBook() { document.getElementById('book-overlay').classList.remove('active'); }
+
+// ── The Quilt: gallery of uploaded activity photos ────────────
+function openQuilt() {
+    const bookEntries = JSON.parse(localStorage.getItem('pf_book') || '[]');
+    const withPhotos = bookEntries.filter(e => e.photo);
+    const el = document.getElementById('quilt-entries');
+    if (withPhotos.length === 0) {
+        el.innerHTML = '<p class="book-empty">No photos yet.<br>Add one when you mark<br>an activity done! 📷</p>';
+    } else {
+        el.innerHTML = '<div class="quilt-grid">' + withPhotos.map((e,i) =>
+            '<div class="quilt-patch" onclick="openLightbox('+i+')"><img src="'+e.photo+'" alt="'+e.activity+'"><div class="quilt-patch-label">'+e.subject+'</div></div>'
+        ).join('') + '</div>';
+        window._quiltPhotos = withPhotos;
+    }
+    document.getElementById('quilt-overlay').classList.add('active');
+}
+function closeQuilt() { document.getElementById('quilt-overlay').classList.remove('active'); }
+
+function openLightbox(i) {
+    const entry = window._quiltPhotos[i];
+    document.getElementById('lightbox-img').src = entry.photo;
+    document.getElementById('lightbox-caption').textContent = entry.activity;
+    document.getElementById('lightbox-sub').textContent = entry.subject;
+    document.getElementById('lightbox').classList.add('active');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
+
+window.addEventListener('resize', render);
+document.getElementById('tree-img').addEventListener('load', render);
 render();
+
+// ── Fruit basket: add more passions ──────────────────────────
+let basketSel = new Set();
+
+function openBasket() {
+    const grid = document.getElementById('add-grid');
+    grid.innerHTML = '';
+    basketSel = new Set();
+    ALL_SUBJECTS.forEach(subj => {
+        const taken = selected.includes(subj);
+        const card = document.createElement('div');
+        card.className = 'add-card' + (taken ? ' disabled' : '');
+        card.innerHTML = '<span class="add-tick">✓</span><span class="add-emoji">'+(SUBJECT_EMOJI[subj]||'🍎')+'</span><span class="add-name">'+subj+(taken?' (added)':'')+'</span>';
+        if (!taken) {
+            card.onclick = () => {
+                if (basketSel.has(subj)) { basketSel.delete(subj); card.classList.remove('on'); }
+                else { basketSel.add(subj); card.classList.add('on'); }
+            };
+        }
+        grid.appendChild(card);
+    });
+    document.getElementById('basket-overlay').classList.add('active');
+}
+
+function closeBasket() {
+    document.getElementById('basket-overlay').classList.remove('active');
+}
+
+function confirmBasket() {
+    if (basketSel.size === 0) { alert('Pick at least one new passion!'); return; }
+    // Stash the current full subject list so the swipe page can merge
+    // back into it once the filtered basket round finishes.
+    localStorage.setItem('pf_pending_merge_base', JSON.stringify(selected));
+    localStorage.setItem('pf_basket_mode', 'true');
+    // Temporarily narrow selectedSubjects to ONLY the newly picked
+    // subjects so Swipe_Page.html's existing filter shows just those.
+    localStorage.setItem('selectedSubjects', JSON.stringify([...basketSel]));
+    window.location.href = 'Swipe Page.html';
+}
 </script>
 </body>
 </html>

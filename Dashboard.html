@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PassionFruits – Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { min-height:100vh; background-color:#38167d; font-family:'Press Start 2P',monospace; user-select:none; padding:30px clamp(20px,5vw,60px); }
+.top-row { display:grid; grid-template-columns:1fr 1px 1fr; gap:36px; align-items:center; margin-bottom:24px; }
+.divider-v { background:#F7C948; height:80%; align-self:center; }
+
+.name-card { background:#F7C948; border-radius:26px; padding:28px 32px; display:flex; flex-direction:column; gap:18px; }
+.name-row { display:flex; align-items:center; gap:18px; }
+.avatar { width:64px; height:64px; image-rendering:pixelated; flex-shrink:0; }
+.username { font-family:'Bangers',cursive; font-size:1.8rem; color:#3C1FA8; letter-spacing:0.05em; }
+.stat-row { display:flex; align-items:center; gap:14px; }
+.stat-icon { font-size:1.3rem; }
+.stat-text { font-size:0.5rem; color:#3C1FA8; letter-spacing:0.06em; }
+
+.tree-side { display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; transition:transform 0.15s; }
+.tree-side:hover { transform:translateY(-4px); }
+.tree-side img { width:min(38vw,260px); height:auto; image-rendering:pixelated; }
+.tree-side-label { font-family:'Bangers',cursive; font-size:1.6rem; color:#F7C948; letter-spacing:0.08em; -webkit-text-stroke:1px #3A1E00; text-shadow:2px 2px 0 #3A1E00; }
+
+.section-head { display:flex; align-items:center; gap:18px; margin:30px 0 22px; }
+.section-title { font-family:'Bangers',cursive; font-size:1.5rem; color:#F7C948; letter-spacing:0.08em; white-space:nowrap; }
+.section-line { flex:1; height:3px; background:#F7C948; }
+
+.passion-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:24px; }
+.passion-card { background:#F7C948; border-radius:22px; padding:22px 22px 26px; display:flex; flex-direction:column; gap:14px; }
+.passion-card.empty { opacity:0.4; }
+.passion-top { display:flex; align-items:center; gap:14px; }
+.passion-emoji { font-size:1.8rem; }
+.passion-name { font-family:'Bangers',cursive; font-size:1.3rem; color:#3C1FA8; letter-spacing:0.05em; }
+.passion-level-row { display:flex; align-items:center; gap:10px; }
+.passion-level-icon { font-size:1.1rem; }
+.passion-level-text { font-size:0.55rem; color:#3C1FA8; letter-spacing:0.06em; }
+.progress-track { width:100%; height:18px; background:#9a7510; border-radius:10px; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(180deg,#6fa8ff,#3C7CE0); border-radius:10px 0 0 10px; transition:width 0.3s ease; }
+.empty-state { text-align:center; font-size:0.4rem; color:rgba(255,255,255,0.4); padding:30px; letter-spacing:0.08em; line-height:2; }
+
+.logout-btn { position:fixed; top:24px; right:30px; font-family:'Press Start 2P',monospace; font-size:0.4rem; color:#F7C948; background:none; border:2px solid #F7C948; border-radius:8px; padding:8px 12px; cursor:pointer; }
+.logout-btn:hover { background:rgba(247,201,72,0.15); }
+
+@media (max-width:760px) {
+    .top-row { grid-template-columns:1fr; }
+    .divider-v { display:none; }
+}
+</style>
+</head>
+<body>
+<button class="logout-btn" onclick="logout()">Log Out</button>
+
+<div class="top-row">
+    <div class="name-card">
+        <div class="name-row">
+            <canvas class="avatar" id="avatar" width="64" height="64"></canvas>
+            <span class="username" id="username-display">"Name"</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-icon">🌳</span>
+            <span class="stat-text" id="active-count">0 active passions</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-icon">⭐</span>
+            <span class="stat-text" id="discovered-count">0 passions discovered</span>
+        </div>
+    </div>
+
+    <div class="divider-v"></div>
+
+    <div class="tree-side" onclick="window.location.href='tree.html'">
+        <img src="tree_big.png" alt="My Tree">
+        <span class="tree-side-label">My Tree</span>
+    </div>
+</div>
+
+<div class="section-head">
+    <span class="section-title">Passions</span>
+    <div class="section-line"></div>
+</div>
+
+<div class="passion-grid" id="passion-grid"></div>
+
+<script>
+const SUBJECT_EMOJI={'Math':'🍎','Science':'🍋','Art':'🍉','History':'🍊','English':'🍋','World Language':'🍇','Music':'🍓','Sports':'🍌','Extra-Curriculars':'🍍'};
+
+const userName = localStorage.getItem('userName') || 'Guest';
+document.getElementById('username-display').textContent = '"' + userName + '"';
+
+function logout() {
+    localStorage.removeItem('isLoggedIn');
+    window.location.href = 'Login Page.html';
+}
+
+// ── Stats ──────────────────────────────────────────────────────
+const selected = JSON.parse(localStorage.getItem('selectedSubjects') || '[]');
+const discovered = JSON.parse(localStorage.getItem('pf_discovered') || '[]');
+const levels = JSON.parse(localStorage.getItem('pf_levels') || '{}');
+
+document.getElementById('active-count').textContent = selected.length + ' active passion' + (selected.length===1?'':'s');
+document.getElementById('discovered-count').textContent = discovered.length + ' passion' + (discovered.length===1?'':'s') + ' discovered';
+
+// ── Avatar: simple pixel-fruit face, matches the app's fruit motif ──
+(function drawAvatar(){
+    const c = document.getElementById('avatar');
+    const ctx = c.getContext('2d');
+    const ps = 4;
+    const grid = [
+        '0001111100',
+        '0011111110',
+        '0111111111',
+        '1111111111',
+        '1101111011',
+        '1111111111',
+        '1110111011',
+        '1111111111',
+        '0111111110',
+        '0011111100',
+    ];
+    const pal = {'1':'#E8742C'};
+    grid.forEach((row,r)=>[...row].forEach((ch,col)=>{
+        if (ch==='0') return;
+        ctx.fillStyle = pal[ch];
+        ctx.fillRect(col*ps, r*ps, ps, ps);
+    }));
+    // leaf
+    ctx.fillStyle = '#2a8a2a';
+    ctx.fillRect(5*ps, -1*ps+4, ps, ps);
+})();
+
+// ── Per-subject level cards ───────────────────────────────────
+function fruitProgress(subject) {
+    // Counts fruits completed in the CURRENT cycle on that subject's tree
+    // (out of 3) — i.e. progress toward the next level.
+    const slots = JSON.parse(localStorage.getItem('pf_subject_buds_' + subject) || 'null');
+    if (!slots) return 0;
+    return slots.filter(s => s.stage === 'fruit').length;
+}
+
+function renderPassions() {
+    const grid = document.getElementById('passion-grid');
+    if (discovered.length === 0) {
+        grid.innerHTML = '<p class="empty-state">No passions discovered yet.<br>Head to your tree to get started! 🌱</p>';
+        return;
+    }
+    grid.innerHTML = discovered.map(subj => {
+        const level = levels[subj] || 0;
+        const progress = fruitProgress(subj);
+        const pct = Math.round((progress/3)*100);
+        const isActive = selected.includes(subj);
+        return '<div class="passion-card' + (isActive?'':' empty') + '">' +
+            '<div class="passion-top">' +
+                '<span class="passion-emoji">' + (SUBJECT_EMOJI[subj]||'🍎') + '</span>' +
+                '<span class="passion-name">' + subj + '</span>' +
+            '</div>' +
+            '<div class="passion-level-row">' +
+                '<span class="passion-level-icon">🏅</span>' +
+                '<span class="passion-level-text">LEVEL ' + level + '</span>' +
+            '</div>' +
+            '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%;"></div></div>' +
+        '</div>';
+    }).join('');
+}
+renderPassions();
+</script>
+</body>
+</html>
