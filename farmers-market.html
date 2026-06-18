@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PassionFruits – Farmers Market</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
+<script src="tutorial.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { background:#000; font-family:'Press Start 2P',monospace; overflow:hidden; height:100%; }
@@ -189,6 +190,7 @@ function escapeHtml(str) {
 }
 
 renderFeed();
+if (typeof PFTutorial !== 'undefined') PFTutorial.trigger('farmers_market_intro');
 </script>
 </body>
 </html>

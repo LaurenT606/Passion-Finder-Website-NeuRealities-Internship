@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PassionFruits – Log In</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
+<script src="tutorial.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -345,28 +346,18 @@
         drawTree();
         window.addEventListener('resize', drawTree);
 
-        function getUsers() {
-            return JSON.parse(localStorage.getItem('pf_users') || '[]');
-        }
-
         function handleLogin() {
             const name     = document.getElementById('name').value.trim();
             const email    = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             if (!name || !email || !password) {
-                alert('Please fill in all fields.');
-                return;
-            }
-            const users = getUsers();
-            const match = users.find(u => u.email === email && u.password === password);
-            if (!match) {
-                alert('No account found with those details.\nPlease sign up first or check your email and password.');
+                alert('Please fill in your name, email, and password.');
                 return;
             }
             localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userName', match.name);
-            localStorage.setItem('userEmail', match.email);
-            window.location.href = localStorage.getItem('selectedSubjects') ? 'tree.html' : 'fruitbowl.html';
+            localStorage.setItem('userName', name);
+            localStorage.setItem('userEmail', email);
+            window.location.href = 'Dashboard.html';
         }
 
         function handleSignup() {
@@ -374,21 +365,18 @@
             const email    = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             if (!name || !email || !password) {
-                alert('Please fill in all fields.');
+                alert('Please fill in your name, email, and password.');
                 return;
             }
-            const users = getUsers();
-            if (users.find(u => u.email === email)) {
-                alert('An account with that email already exists.\nPlease log in instead.');
-                return;
-            }
-            users.push({ name, email, password });
-            localStorage.setItem('pf_users', JSON.stringify(users));
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('userName', name);
             localStorage.setItem('userEmail', email);
+            // New sign-ups always go to fruitbowl to pick passions
             window.location.href = 'fruitbowl.html';
         }
+    </script>
+    <script>
+        if (typeof PFTutorial !== 'undefined') PFTutorial.trigger('login_intro');
     </script>
 </body>
 </html>

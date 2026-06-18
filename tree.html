@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PassionFruits – Your Tree</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
+<script src="tutorial.js"></script>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { min-height:100vh; background-color:#38167d; font-family:'Press Start 2P',monospace; overflow:hidden; user-select:none; }
@@ -91,8 +92,6 @@
     <div class="nav-right">
         <button class="quilt-btn" onclick="openQuilt()"><img src="quilt_icon.png" alt="">The Quilt</button>
         <button class="book-btn" onclick="openBook()">📖 My Book</button>
-        <button class="book-btn" onclick="window.location.href='profile.html'" style="background:#5a30a8;color:#fff;">👤 Profile</button>
-<button class="book-btn" onclick="logout()" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);">Log Out</button>
     </div>
 </div>
 <div class="stage" id="stage">
@@ -235,7 +234,10 @@ function render() {
 
         node.addEventListener('click', () => {
             if (isComplete) showRewardInfo(subj);
-            else window.location.href = 'subject-tree.html?subject=' + encodeURIComponent(subj);
+            else {
+                localStorage.setItem('pf_bud_clicked_once', 'true');
+                window.location.href = 'subject-tree.html?subject=' + encodeURIComponent(subj);
+            }
         });
         stage.appendChild(node);
     });
@@ -317,6 +319,27 @@ function closeLightbox() { document.getElementById('lightbox').classList.remove(
 window.addEventListener('resize', render);
 document.getElementById('tree-img').addEventListener('load', render);
 render();
+
+// ── Tutorial hooks ─────────────────────────────────────────────
+// If they've already clicked a bud before and still have buds left,
+// nudge them toward clicking another one.
+setTimeout(() => {
+    if (typeof PFTutorial === 'undefined') return;
+    const completeMap = getCompleteMap();
+    const hasUnclickedBud = selected.some(s => !completeMap[s]);
+    const clickedOnce = localStorage.getItem('pf_bud_clicked_once') === 'true';
+    if (hasUnclickedBud && clickedOnce) {
+        PFTutorial.trigger('tree_second_bud');
+    }
+
+    // Book/quilt pointers fire the first time we land back on the main
+    // tree right after completing ANY activity (flag set by subject-tree.html).
+    if (localStorage.getItem('pf_just_completed_activity') === 'true') {
+        localStorage.removeItem('pf_just_completed_activity');
+        PFTutorial.trigger('tree_book_pointer');
+        PFTutorial.trigger('tree_quilt_pointer');
+    }
+}, 300);
 
 // ── Fruit basket: add more passions ──────────────────────────
 let basketSel = new Set();

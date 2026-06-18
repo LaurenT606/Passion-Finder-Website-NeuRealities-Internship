@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PassionFruits – Subject Tree</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
+<script src="tutorial.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { min-height:100vh; background-color:#38167d; font-family:'Press Start 2P',monospace; overflow:hidden; user-select:none; }
@@ -370,6 +371,8 @@ function markDone(id) {
     pendingPhoto = null;
     closePopup();
     render();
+    localStorage.setItem('pf_just_completed_activity', 'true');
+    if (typeof PFTutorial !== 'undefined') PFTutorial.trigger('fruit_harvest_tip');
 }
 
 function swapActivity(id) {
@@ -396,6 +399,12 @@ function goBack() { window.location.href = 'tree.html'; }
 
 window.addEventListener('resize', render);
 render();
+
+setTimeout(() => {
+    if (typeof PFTutorial === 'undefined') return;
+    const hasBud = slots.some(s => s.stage === 'bud');
+    if (hasBud) PFTutorial.trigger('tree_intro');
+}, 300);
 </script>
 </body>
 </html>

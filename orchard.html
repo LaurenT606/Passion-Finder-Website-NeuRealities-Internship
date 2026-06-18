@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PassionFruits – The Orchard</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
+<script src="tutorial.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { min-height:100vh; background-color:#38167d; font-family:'Press Start 2P',monospace; overflow-x:hidden; user-select:none; }
@@ -73,7 +74,6 @@ body { min-height:100vh; background-color:#38167d; font-family:'Press Start 2P',
 </div>
 
 <script>
-if(!localStorage.getItem('isLoggedIn')){window.location.replace('Login Page.html');}
 // Demo / placeholder friend data — no backend yet, just hardcoded for now.
 const FRIENDS = [
     { name:'Kai',   subject:'Sports',         caption:'Sparring session at martial arts class', photo:'kai_sports.jpg' },
@@ -139,6 +139,7 @@ function openFriendBook(f) {
 function closePopup() { document.getElementById('overlay').classList.remove('active'); }
 
 renderGrove();
+if (typeof PFTutorial !== 'undefined') PFTutorial.trigger('orchard_intro');
 </script>
 </body>
 </html>
