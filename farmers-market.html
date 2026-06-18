@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PassionFruits – Farmers Market</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { background:#000; font-family:'Press Start 2P',monospace; overflow:hidden; height:100%; }
+
+.nav { position:fixed; top:0; left:0; right:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:14px 20px; background:linear-gradient(180deg, rgba(0,0,0,0.65), transparent); }
+.back-btn { font-family:'Press Start 2P',monospace; font-size:0.5rem; color:#F7C948; background:none; border:2px solid #F7C948; border-radius:8px; padding:8px 12px; cursor:pointer; }
+.back-btn:hover { background:rgba(247,201,72,0.15); }
+.logo { font-family:'Bangers',cursive; font-size:1.4rem; color:#F7C948; letter-spacing:0.06em; -webkit-text-stroke:1px #3A1E00; text-shadow:2px 2px 0 #3A1E00; }
+
+.feed { height:100vh; overflow-y:scroll; scroll-snap-type:y mandatory; scroll-behavior:smooth; }
+.feed::-webkit-scrollbar { display:none; }
+
+.slide { height:100vh; width:100%; scroll-snap-align:start; position:relative; display:flex; align-items:center; justify-content:center; background:#000; }
+.video-frame-wrap { position:relative; height:100%; width:100%; max-width:480px; margin:0 auto; display:flex; align-items:center; justify-content:center; }
+.video-frame-wrap video { width:100%; height:100%; object-fit:contain; background:#000; display:block; }
+
+.side-actions { position:absolute; right:14px; bottom:120px; display:flex; flex-direction:column; align-items:center; gap:22px; z-index:20; }
+.action-btn { background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; color:#fff; }
+.action-icon { font-size:2rem; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6)); transition:transform 0.15s; }
+.action-btn:active .action-icon { transform:scale(1.3); }
+.action-btn.liked .action-icon { filter:drop-shadow(0 2px 4px rgba(255,60,90,0.7)); }
+.action-count { font-size:0.4rem; letter-spacing:0.05em; text-shadow:1px 1px 0 rgba(0,0,0,0.8); }
+
+.caption-bar { position:absolute; left:16px; right:80px; bottom:36px; z-index:20; color:#fff; }
+.caption-source { font-size:0.42rem; letter-spacing:0.08em; color:#F7C948; text-shadow:1px 1px 0 rgba(0,0,0,0.8); margin-bottom:6px; text-transform:uppercase; }
+.caption-text { font-size:0.4rem; letter-spacing:0.06em; line-height:1.8; text-shadow:1px 1px 0 rgba(0,0,0,0.8); }
+
+.comments-overlay { display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.55); align-items:flex-end; justify-content:center; }
+.comments-overlay.active { display:flex; }
+.comments-sheet { background:#1f0d47; border-radius:24px 24px 0 0; width:100%; max-width:480px; max-height:65vh; display:flex; flex-direction:column; padding:18px 18px 14px; }
+.comments-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.comments-title { font-size:0.5rem; color:#F7C948; letter-spacing:0.08em; }
+.comments-close { background:none; border:none; color:rgba(255,255,255,0.5); font-size:0.85rem; cursor:pointer; }
+.comments-close:hover { color:#fff; }
+.comments-list { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:12px; margin-bottom:14px; }
+.comment-row { display:flex; gap:10px; align-items:flex-start; }
+.comment-avatar { width:22px; height:22px; border-radius:50%; background:#5a30a8; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.5rem; }
+.comment-body { font-size:0.38rem; color:#fff; line-height:1.7; letter-spacing:0.04em; background:#2a0e5e; border-radius:10px; padding:8px 10px; }
+.comments-empty { font-size:0.38rem; color:rgba(255,255,255,0.35); text-align:center; padding:20px; letter-spacing:0.06em; line-height:2; }
+.comment-input-row { display:flex; gap:8px; }
+.comment-input { flex:1; background:#2a0e5e; border:none; border-radius:14px; padding:11px 14px; color:#fff; font-family:'Press Start 2P',monospace; font-size:0.4rem; outline:none; }
+.comment-input::placeholder { color:rgba(255,255,255,0.3); }
+.comment-send { font-family:'Press Start 2P',monospace; font-size:0.42rem; color:#38167d; background:#F7C948; border:none; border-radius:14px; padding:0 16px; cursor:pointer; }
+.comment-send:hover { background:#ffe066; }
+</style>
+</head>
+<body>
+<div class="nav">
+    <button class="back-btn" onclick="window.location.href='tree.html'">← My Tree</button>
+    <span class="logo">Farmers Market</span>
+    <span style="width:90px;"></span>
+</div>
+
+<div class="feed" id="feed"></div>
+
+<div class="comments-overlay" id="comments-overlay">
+    <div class="comments-sheet">
+        <div class="comments-head">
+            <span class="comments-title">💬 Comments</span>
+            <button class="comments-close" onclick="closeComments()">✕</button>
+        </div>
+        <div class="comments-list" id="comments-list"></div>
+        <div class="comment-input-row">
+            <input type="text" class="comment-input" id="comment-input" placeholder="Add a comment..." maxlength="140">
+            <button class="comment-send" onclick="submitComment()">Post</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Friends' own videos, stored locally as plain HTML5 video files.
+const VIDEOS = [
+    { file:'friend_video_1.mp4', source:'@friend', caption:'Check this out 🌱' },
+    { file:'friend_video_2.mp4', source:'@friend', caption:'Activity in action' },
+    { file:'friend_video_3.mp4', source:'@friend', caption:'New passion unlocked' },
+];
+
+const likes = JSON.parse(localStorage.getItem('pf_market_likes') || '{}');
+const saves = JSON.parse(localStorage.getItem('pf_market_saves') || '{}');
+const comments = JSON.parse(localStorage.getItem('pf_market_comments') || '{}');
+
+function persistLikes() { localStorage.setItem('pf_market_likes', JSON.stringify(likes)); }
+function persistSaves() { localStorage.setItem('pf_market_saves', JSON.stringify(saves)); }
+function persistComments() { localStorage.setItem('pf_market_comments', JSON.stringify(comments)); }
+
+function renderFeed() {
+    const feed = document.getElementById('feed');
+    feed.innerHTML = VIDEOS.map(v => {
+        const key = v.file;
+        const likeCount = likes[key]?.count ?? Math.floor(Math.random()*40)+5;
+        const isLiked = !!likes[key]?.on;
+        const isSaved = !!saves[key];
+        const commentCount = (comments[key] || []).length;
+        return `
+        <div class="slide" data-id="${key}">
+            <div class="video-frame-wrap">
+                <video src="${v.file}" playsinline loop controls preload="metadata"></video>
+            </div>
+            <div class="caption-bar">
+                <div class="caption-source">${v.source}</div>
+                <div class="caption-text">${v.caption}</div>
+            </div>
+            <div class="side-actions">
+                <button class="action-btn ${isLiked?'liked':''}" onclick="toggleLike('${key}')">
+                    <span class="action-icon">${isLiked?'❤️':'🤍'}</span>
+                    <span class="action-count" id="like-count-${key}">${likeCount}</span>
+                </button>
+                <button class="action-btn" onclick="openComments('${key}')">
+                    <span class="action-icon">💬</span>
+                    <span class="action-count" id="comment-count-${key}">${commentCount}</span>
+                </button>
+                <button class="action-btn" onclick="toggleSave('${key}')">
+                    <span class="action-icon">${isSaved?'⭐':'☆'}</span>
+                    <span class="action-count">${isSaved?'Saved':'Save'}</span>
+                </button>
+            </div>
+        </div>`;
+    }).join('');
+
+    // Auto-play/pause videos as they snap into view, muted-friendly default
+    // (browsers block unmuted autoplay, so we just let users tap play via controls).
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const vid = entry.target.querySelector('video');
+            if (!vid) return;
+            if (entry.isIntersecting) vid.play().catch(()=>{});
+            else vid.pause();
+        });
+    }, { threshold: 0.6 });
+    document.querySelectorAll('.slide').forEach(s => observer.observe(s));
+}
+
+function toggleLike(id) {
+    const cur = likes[id] || { on:false, count: Math.floor(Math.random()*40)+5 };
+    cur.on = !cur.on;
+    cur.count += cur.on ? 1 : -1;
+    likes[id] = cur;
+    persistLikes();
+    renderFeed();
+}
+
+function toggleSave(id) {
+    saves[id] = !saves[id];
+    if (!saves[id]) delete saves[id];
+    persistSaves();
+    renderFeed();
+}
+
+let activeCommentId = null;
+function openComments(id) {
+    activeCommentId = id;
+    const list = document.getElementById('comments-list');
+    const entries = comments[id] || [];
+    list.innerHTML = entries.length === 0
+        ? '<p class="comments-empty">No comments yet.<br>Be the first! 🌱</p>'
+        : entries.map(c => `<div class="comment-row"><div class="comment-avatar">🍊</div><div class="comment-body">${escapeHtml(c)}</div></div>`).join('');
+    document.getElementById('comments-overlay').classList.add('active');
+    document.getElementById('comment-input').value = '';
+}
+function closeComments() {
+    document.getElementById('comments-overlay').classList.remove('active');
+    activeCommentId = null;
+}
+function submitComment() {
+    const input = document.getElementById('comment-input');
+    const text = input.value.trim();
+    if (!text || !activeCommentId) return;
+    if (!comments[activeCommentId]) comments[activeCommentId] = [];
+    comments[activeCommentId].push(text);
+    persistComments();
+    openComments(activeCommentId); // re-render list
+    renderFeed(); // update comment count on the slide behind
+}
+document.getElementById('comment-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitComment();
+});
+
+function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+}
+
+renderFeed();
+</script>
+</body>
+</html>
