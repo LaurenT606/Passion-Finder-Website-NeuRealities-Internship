@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PassionFruits – Log In</title>
+    <title>PassionFruits – Sign Up</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
         body {
             min-height: 100vh;
-            background-color: #38167d;
-            animation: fadeIn 0.35s ease;
+            background-color: #3C1FA8;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -47,14 +45,15 @@
         .card {
             position: relative;
             z-index: 10;
-            background: #2a0e5e;
-            border: 2px solid rgba(247,201,72,0.25);
+            background: #3D1C0A;
             border-radius: 36px;
-            padding: 48px 56px 40px;
+            padding: 44px 56px 36px;
             width: clamp(300px, 90vw, 460px);
             display: flex;
             flex-direction: column;
             align-items: center;
+            max-height: 88vh;
+            overflow-y: auto;
         }
 
         .tagline {
@@ -63,7 +62,7 @@
             letter-spacing: 0.12em;
             text-transform: uppercase;
             text-align: center;
-            margin-bottom: 36px;
+            margin-bottom: 32px;
             line-height: 1.8;
         }
 
@@ -83,7 +82,7 @@
 
         .form-group input {
             width: 100%;
-            background: #4a2090;
+            background: #5C2E0E;
             border: none;
             border-radius: 12px;
             padding: 14px 18px;
@@ -97,10 +96,18 @@
         .form-group input::placeholder { color: rgba(255,255,255,0.3); }
         .form-group input:focus { box-shadow: 0 0 0 2px #F5C842; }
 
+        .hint {
+            font-size: 0.4rem;
+            color: rgba(255,255,255,0.35);
+            margin-top: 6px;
+            letter-spacing: 0.06em;
+            line-height: 1.6;
+        }
+
         .btn-row {
             display: flex;
             gap: 24px;
-            margin-top: 28px;
+            margin-top: 24px;
             width: 100%;
             justify-content: center;
         }
@@ -108,46 +115,57 @@
         .btn-primary {
             font-family: 'Press Start 2P', monospace;
             font-size: clamp(0.55rem, 1.2vw, 0.75rem);
-            color: #38167d;
-            background: #F7C948;
+            color: #FFFFFF;
+            background: transparent;
             border: none;
             cursor: pointer;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            padding: 12px 24px;
-            border-radius: 12px;
-            transition: background 0.15s, transform 0.1s;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: background 0.15s;
         }
 
-        .btn-primary:hover { background: #ffe066; }
+        .btn-primary:hover { background: rgba(255,255,255,0.1); }
         .btn-primary:active { transform: scale(0.97); }
 
-        .btn-secondary-login {
+        .btn-create {
+            width: 100%;
             font-family: 'Press Start 2P', monospace;
-            font-size: clamp(0.55rem, 1.2vw, 0.75rem);
-            color: rgba(255,255,255,0.7);
-            background: transparent;
-            border: 2px solid rgba(255,255,255,0.25);
+            font-size: clamp(0.6rem, 1.4vw, 0.8rem);
+            color: #38167d;
+            background: #F7C948;
+            border: none;
+            border-radius: 14px;
+            padding: 16px 20px;
             cursor: pointer;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            padding: 12px 24px;
-            border-radius: 12px;
-            transition: border-color 0.15s, color 0.15s;
+            margin-top: 8px;
+            transition: background 0.15s;
         }
-        .btn-secondary-login:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
+        .btn-create:hover { background: #ffe066; }
+        .btn-create:active { transform: scale(0.98); }
 
-        .divider {
-            width: 1px;
-            background: rgba(255,255,255,0.15);
-            align-self: stretch;
+        .login-link {
+            margin-top: 22px;
+            font-size: 0.46rem;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
         }
+        .login-link a {
+            color: #F7C948;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .login-link a:hover { text-decoration: underline; }
 
         .skip {
-            margin-top: 28px;
-            font-size: 0.5rem;
-            color: rgba(255,255,255,0.45);
-            letter-spacing: 0.12em;
+            margin-top: 16px;
+            font-size: 0.46rem;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             cursor: pointer;
             background: none;
@@ -156,18 +174,20 @@
         }
         .skip:hover { color: rgba(255,255,255,0.7); }
 
-        .forgot {
-            margin-top: 10px;
-            font-size: 0.45rem;
-            color: rgba(255,255,255,0.35);
-            letter-spacing: 0.1em;
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-family: 'Press Start 2P', monospace;
-            text-transform: uppercase;
+        .error {
+            width: 100%;
+            background: rgba(220,60,60,0.15);
+            border: 2px solid #d04848;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.46rem;
+            color: #ff9999;
+            letter-spacing: 0.06em;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            display: none;
         }
-        .forgot:hover { color: #F5C842; }
+        .error.show { display: block; }
     </style>
 </head>
 <body>
@@ -177,11 +197,13 @@
     <h1 class="logo">PassionFruits</h1>
 
     <div class="card">
-        <p class="tagline">Find Your Passion</p>
+        <p class="tagline">Create Your Account</p>
+
+        <div class="error" id="error-box"></div>
 
         <div class="form-group">
             <label for="name">Name</label>
-            <input type="text" id="name" name="name" placeholder="your name" autocomplete="name" />
+            <input type="text" id="name" name="name" placeholder="Your name" autocomplete="name" />
         </div>
 
         <div class="form-group">
@@ -191,40 +213,31 @@
 
         <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" />
+            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="new-password" />
         </div>
 
-        <button class="forgot">Forgot password?</button>
-
-        <div class="btn-row">
-            <button class="btn-primary" onclick="handleLogin()">Log In</button>
-            <div class="divider"></div>
-            <button class="btn-secondary-login" onclick="handleSignup()">Sign Up</button>
+        <div class="form-group" style="margin-bottom:4px;">
+            <label for="confirm">Confirm Password</label>
+            <input type="password" id="confirm" name="confirm" placeholder="••••••••" autocomplete="new-password" />
         </div>
+        <p class="hint">At least 6 characters</p>
 
-        <button class="skip" onclick="localStorage.setItem('isLoggedIn','true');localStorage.setItem('userName','Guest');window.location.href='fruitbowl.html'">Skip for now</button>
+        <button class="btn-create" onclick="handleSignup()">Create Account</button>
+
+        <p class="login-link">Already have an account? <a onclick="window.location.href='Login Page.html'">Log In</a></p>
+
+        <button class="skip" onclick="window.location.href='fruitbowl.html'">Skip for now</button>
     </div>
 
     <script>
-        // Pixel art tree
+        // Pixel art tree (same as login page)
         const canvas = document.getElementById('tree');
         const ctx = canvas.getContext('2d');
-
-        // Scale: 1 "pixel" = P real pixels
         const P = 8;
-
-        // Palette
         const _ = null;
-        const K = '#1A0800';     // darkest outline
-        const A = '#4F1F06';     // very dark brown
-        const B = '#7A3410';     // dark brown
-        const C = '#9E501C';     // medium brown
-        const D = '#BA7028';     // warm brown
-        const E = '#CC8C3E';     // light brown
-        const F = '#DCA852';     // highlight
-        const G = '#EEC870';     // bright highlight
+        const K = '#1A0800', A = '#4F1F06', B = '#7A3410', C = '#9E501C';
+        const D = '#BA7028', E = '#CC8C3E', F = '#DCA852', G = '#EEC870';
 
-        // Trunk column color profile — 56px wide
         const TRUNK_W = 56;
         const TRUNK_PROFILE = [
             K,K, A,A,A,A, B,B,B,B, C,C,C,C, D,D,D,D, E,E,E,E, F,F,F,F,
@@ -232,7 +245,6 @@
             F,F,F,F, E,E,E,E, D,D,D,D, C,C,C,C, B,B,B,B, A,A,A,A, K,K
         ];
 
-        // Bark cracks
         const BARK = [
             { period: 13, phase: 5,  startCol: 16, endCol: 36, color: C },
             { period: 13, phase: 5,  startCol: 20, endCol: 28, color: B },
@@ -242,10 +254,7 @@
             { period: 19, phase: 11, startCol: 12, endCol: 22, color: B },
         ];
 
-        // Left branch pixel map (1=dark, 2=medium, 3=light)
-        // Each row indexed left-to-right, drawn to the LEFT of the trunk
         const LEFT_BRANCH = [
-        //   15 cols wide (rightmost = trunk edge)
             [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,0,0,1,2,3,3,2,1],
             [0,0,0,0,0,0,0,1,2,3,3,3,3,2,1],
@@ -258,9 +267,7 @@
             [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
         ];
 
-        // Right branch pixel map (drawn to the RIGHT of the trunk)
         const RIGHT_BRANCH = [
-        //   16 cols wide (leftmost = trunk edge)
             [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
             [1,2,2,3,3,2,1,0,0,0,0,0,0,0,0,0],
             [1,2,3,3,3,3,2,2,1,0,0,0,0,0,0,0],
@@ -273,7 +280,6 @@
             [0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],
         ];
 
-        // Lower-left small branch
         const LEFT_BRANCH2 = [
             [0,0,0,0,0,0,0,0,0,0,0,0],
             [0,0,0,0,0,0,0,1,2,3,2,1],
@@ -316,22 +322,18 @@
             const tcx   = Math.round(cols / 2);
             const tx    = tcx - Math.floor(TRUNK_W / 2);
 
-            // Trunk
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < TRUNK_W; c++) {
                     let color = TRUNK_PROFILE[c];
-
                     for (const b of BARK) {
                         if (r % b.period === b.phase && c >= b.startCol && c < b.endCol) {
                             color = b.color;
                         }
                     }
-
                     px(tx + c, r, color);
                 }
             }
 
-            // Branches
             const lb1y = Math.floor(rows * 0.27);
             drawBranch(LEFT_BRANCH,  tx,            lb1y, 'left');
 
@@ -345,32 +347,44 @@
         drawTree();
         window.addEventListener('resize', drawTree);
 
-        function handleLogin() {
-            const name     = document.getElementById('name').value.trim();
-            const email    = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            if (!name || !email || !password) {
-                alert('Please fill in your name, email, and password.');
-                return;
-            }
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userName', name);
-            localStorage.setItem('userEmail', email);
-            window.location.href = 'Dashboard.html';
+        // Signup handler
+        function showError(msg) {
+            const box = document.getElementById('error-box');
+            box.textContent = msg;
+            box.classList.add('show');
+        }
+        function clearError() {
+            document.getElementById('error-box').classList.remove('show');
         }
 
         function handleSignup() {
+            clearError();
             const name     = document.getElementById('name').value.trim();
             const email    = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            if (!name || !email || !password) {
-                alert('Please fill in your name, email, and password.');
+            const confirm  = document.getElementById('confirm').value;
+
+            if (!name || !email || !password || !confirm) {
+                showError('Please fill in all fields.');
                 return;
             }
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userName', name);
-            localStorage.setItem('userEmail', email);
-            // New sign-ups always go to fruitbowl to pick passions
+            if (!email.includes('@') || !email.includes('.')) {
+                showError('Please enter a valid email address.');
+                return;
+            }
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters.');
+                return;
+            }
+            if (password !== confirm) {
+                showError('Passwords do not match.');
+                return;
+            }
+
+            // Store basic account info locally (no backend yet)
+            localStorage.setItem('pf_user_name', name);
+            localStorage.setItem('pf_user_email', email);
+
             window.location.href = 'fruitbowl.html';
         }
     </script>
