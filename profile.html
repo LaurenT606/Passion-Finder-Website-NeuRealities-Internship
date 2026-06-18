@@ -101,11 +101,13 @@
             justify-content: center;
             gap: 8px;
             cursor: pointer;
+            overflow: hidden;
+            min-width: 0;
         }
         .tree-half:hover .tree-label { color: #ffe066; }
-        .tree-half:hover #tree-canvas { opacity: 0.85; }
+        .tree-half:hover #tree-img { opacity: 0.85; }
 
-        #tree-canvas { image-rendering: pixelated; max-height: 55vh; }
+        #tree-img { image-rendering: pixelated; max-height: 32vh; max-width: 100%; object-fit: contain; }
 
         .tree-label {
             font-family: 'Bangers', cursive;
@@ -241,7 +243,7 @@
         </div>
 
         <div class="tree-half" onclick="window.location.href='tree.html'" title="Go to your tree">
-            <canvas id="tree-canvas"></canvas>
+            <img id="tree-img" src="tree_big.png" alt="Your tree">
             <div class="tree-label">MY TREE</div>
         </div>
     </div>
@@ -347,9 +349,6 @@ document.getElementById('profile-name').textContent = '"' + rawName.toUpperCase(
 document.getElementById('active-count').textContent     = buds.length        + ' ACTIVE PASSIONS';
 document.getElementById('discovered-count').textContent = bookEntries.length + ' PASSIONS DISCOVERED';
 
-// Tree
-const allFruit = buds.length > 0 && buds.every(b => b.stage === 'fruit');
-renderMiniTree(document.getElementById('tree-canvas'), allFruit);
 
 // Passion cards
 const subjects = selectedSubjects.length > 0 ? selectedSubjects.slice(0, 3) : ['Math', 'Art', 'Music'];
