@@ -356,7 +356,7 @@
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('userName', name);
             localStorage.setItem('userEmail', email);
-            window.location.href = 'Dashboard.html';
+            window.location.href = localStorage.getItem('selectedSubjects') ? 'tree.html' : 'fruitbowl.html';
         }
 
         function handleSignup() {
