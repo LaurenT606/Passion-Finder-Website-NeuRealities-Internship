@@ -19,6 +19,7 @@
         .tick{position:absolute;top:8px;right:10px;font-size:.9rem;opacity:0}
         .card.on .tick{opacity:1}
         .emoji{font-size:2.8rem;line-height:1}
+        .emoji img{width:4rem;height:4rem;object-fit:contain;image-rendering:pixelated}
         .name{font-size:.5rem;color:#fff;text-align:center;letter-spacing:.08em;text-transform:uppercase;line-height:1.6}
         .go{font-family:'Press Start 2P',monospace;font-size:.7rem;color:#38167d;background:#F7C948;border:none;border-radius:14px;padding:16px 40px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase}
         .go:hover{background:#ffe066}
@@ -32,15 +33,16 @@
 <button class="go" onclick="go()">Continue</button>
 <script>
 const H=[
-    {n:'Math',e:'🍎'},{n:'Science',e:'🍋'},{n:'Art',e:'🍉'},
-    {n:'History',e:'🍊'},{n:'English',e:'🍋'},{n:'World Language',e:'🍇'},
-    {n:'Music',e:'🍓'},{n:'Sports',e:'🍌'},{n:'Extra-Curriculars',e:'🍍'}
+    {n:'Math',e:'🍎',img:'apple.png'},{n:'Science',e:'🍋',img:'lemon.png'},{n:'Art',e:'🍉',img:'watermelon.png'},
+    {n:'History',e:'🍊',img:'orange.png'},{n:'English',e:'🍋',img:'lemon.png'},{n:'World Language',e:'🍇',img:'grape.png'},
+    {n:'Music',e:'🍓',img:'strawberry.png'},{n:'Sports',e:'🍌',img:'banana.png'},{n:'Extra-Curriculars',e:'🍍',img:'pear.png'}
 ];
 const sel=new Set();
 H.forEach(h=>{
     const d=document.createElement('div');
+    const fruit=h.img?'<img src="'+h.img+'" alt="'+h.n+'">':h.e;
     d.className='card';
-    d.innerHTML='<span class="tick">&#10003;</span><span class="emoji">'+h.e+'</span><span class="name">'+h.n+'</span>';
+    d.innerHTML='<span class="tick">&#10003;</span><span class="emoji">'+fruit+'</span><span class="name">'+h.n+'</span>';
     d.onclick=()=>{
         if(sel.has(h.n)){sel.delete(h.n);d.classList.remove('on');}
         else{sel.add(h.n);d.classList.add('on');}
