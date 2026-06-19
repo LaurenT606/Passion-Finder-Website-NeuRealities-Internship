@@ -55,6 +55,7 @@
         .book-filter-btn:hover { border-color:#F7C948; }
         .book-entry { border:2px solid rgba(255,255,255,0.2); border-radius:12px; padding:16px; margin-bottom:14px; display:flex; align-items:center; gap:16px; }
         .book-fruit { font-size:2rem; }
+        .book-fruit-img { width:34px; height:34px; object-fit:contain; image-rendering:pixelated; flex-shrink:0; }
         .book-info { display:flex; flex-direction:column; gap:6px; }
         .book-activity { font-size:0.4rem; color:#F7C948; letter-spacing:0.08em; line-height:1.8; }
         .book-subject { font-size:0.33rem; color:rgba(255,255,255,0.5); letter-spacing:0.1em; text-transform:uppercase; }
@@ -92,8 +93,6 @@
     <div class="nav-right">
         <button class="quilt-btn" onclick="openQuilt()"><img src="quilt_icon.png" alt="">The Quilt</button>
         <button class="book-btn" onclick="openBook()">📖 My Book</button>
-        <button class="book-btn" onclick="window.location.href='profile.html'" style="background:#5a30a8;color:#fff;">👤 Profile</button>
-        <button class="book-btn" onclick="logout()" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);">Log Out</button>
     </div>
 </div>
 <div class="stage" id="stage">
@@ -158,6 +157,7 @@
 
 <script>
 const SUBJECT_EMOJI={'Math':'🍎','Science':'🍋','Art':'🍉','History':'🍊','English':'🍋','World Language':'🍇','Music':'🍓','Sports':'🍌','Extra-Curriculars':'🍍'};
+const SUBJECT_FRUIT_IMG={'Math':'apple.png','Science':'lemon.png','Art':'watermelon.png','History':'orange.png','English':'lemon.png','World Language':'grape.png','Music':'strawberry.png','Sports':'banana.png'};
 const FRUIT_PALS={'🍎':{'1':'#cc1111','2':'#1a7a1a','3':'#ff6666'},'🍋':{'1':'#ddcc00','2':'#1a7a1a','3':'#ffee66'},'🍉':{'1':'#cc2233','2':'#1a7a1a','3':'#ff6677'},'🍊':{'1':'#dd6600','2':'#1a7a1a','3':'#ffaa44'},'🍇':{'1':'#882299','2':'#1a7a1a','3':'#cc66ee'},'🍓':{'1':'#cc1133','2':'#1a7a1a','3':'#ff6688'},'🍌':{'1':'#ddbb00','2':'#1a7a1a','3':'#ffee44'},'🍍':{'1':'#cc8800','2':'#1a7a1a','3':'#ffcc44'}};
 const ALL_SUBJECTS = Object.keys(SUBJECT_EMOJI);
 
@@ -287,7 +287,13 @@ function openBook() {
     const el = document.getElementById('book-entries');
     el.innerHTML = shown.length===0
         ? '<p class="book-empty">No fruits yet.<br>Complete an activity<br>to grow your first fruit! 🌱</p>'
-        : shown.map(e=>'<div class="book-entry"><span class="book-fruit">'+e.emoji+'</span><div class="book-info"><span class="book-activity">'+e.activity+'</span><span class="book-subject">'+e.subject+'</span></div></div>').join('');
+        : shown.map(e=>{
+            const fruitImg = SUBJECT_FRUIT_IMG[e.subject];
+            const fruitVisual = fruitImg
+                ? '<img class="book-fruit-img" src="'+fruitImg+'" alt="'+e.subject+'">'
+                : '<span class="book-fruit">'+e.emoji+'</span>';
+            return '<div class="book-entry">'+fruitVisual+'<div class="book-info"><span class="book-activity">'+e.activity+'</span><span class="book-subject">'+e.subject+'</span></div></div>';
+        }).join('');
     document.getElementById('book-overlay').classList.add('active');
 }
 function closeBook() { document.getElementById('book-overlay').classList.remove('active'); }

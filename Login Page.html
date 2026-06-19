@@ -43,6 +43,7 @@
             -webkit-text-stroke: 2px #3A1E00;
             text-shadow: 4px 4px 0 #3A1E00;
             margin-bottom: 24px;
+            margin-left: 60px;
         }
 
         .card {
@@ -53,6 +54,7 @@
             border-radius: 36px;
             padding: 48px 56px 40px;
             width: clamp(300px, 90vw, 460px);
+            margin-left: 60px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -354,16 +356,10 @@
                 alert('Please fill in your name, email, and password.');
                 return;
             }
-            const users = JSON.parse(localStorage.getItem('pf_users') || '[]');
-            const match = users.find(u => u.email === email && u.password === password);
-            if (!match) {
-                alert('No account found. Please sign up first.');
-                return;
-            }
             localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userName', match.name);
-            localStorage.setItem('userEmail', match.email);
-            window.location.href = localStorage.getItem('selectedSubjects') ? 'tree.html' : 'fruitbowl.html';
+            localStorage.setItem('userName', name);
+            localStorage.setItem('userEmail', email);
+            window.location.href = 'Dashboard.html';
         }
 
         function handleSignup() {
@@ -374,16 +370,10 @@
                 alert('Please fill in your name, email, and password.');
                 return;
             }
-            const users = JSON.parse(localStorage.getItem('pf_users') || '[]');
-            if (users.find(u => u.email === email)) {
-                alert('An account with that email already exists. Please log in.');
-                return;
-            }
-            users.push({ name, email, password });
-            localStorage.setItem('pf_users', JSON.stringify(users));
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('userName', name);
             localStorage.setItem('userEmail', email);
+            // New sign-ups always go to fruitbowl to pick passions
             window.location.href = 'fruitbowl.html';
         }
     </script>

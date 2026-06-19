@@ -77,11 +77,24 @@ html, body { background:#000; font-family:'Press Start 2P',monospace; overflow:h
 
 <script>
 // Friends' own videos, stored locally as plain HTML5 video files.
+const USERNAME_POOL = ['@sunnydays','@pixelpal','@orchardkid','@treehugger22','@fruitloop','@passionseed','@budtobloom','@harvesthero','@leafyvibes','@sproutsquad'];
+function randomUsername(seedKey) {
+    // Deterministic "random" pick so the same video always shows the same
+    // username across reloads, instead of reshuffling every render.
+    let hash = 0;
+    for (let i = 0; i < seedKey.length; i++) hash = (hash * 31 + seedKey.charCodeAt(i)) >>> 0;
+    return USERNAME_POOL[hash % USERNAME_POOL.length];
+}
+
 const VIDEOS = [
-    { file:'friend_video_1.mp4', source:'@friend', caption:'Check this out 🌱' },
-    { file:'friend_video_2.mp4', source:'@friend', caption:'Activity in action' },
-    { file:'friend_video_3.mp4', source:'@friend', caption:'New passion unlocked' },
-];
+    { file:'friend_video_1.mp4', caption:'Check this out 🌱' },
+    { file:'friend_video_2.mp4', caption:'Activity in action' },
+    { file:'friend_video_3.mp4', caption:'New passion unlocked' },
+    { file:'friend_video_skate.mp4', caption:"This skater doesn't believe in gravity 🛹" },
+    { file:'friend_video_craft.mp4', caption:'Making a mini newspaper basket — quick craft idea!' },
+    { file:'friend_video_debate.mp4', caption:'Debate round highlights from WSDC' },
+    { file:'friend_video_martialarts.mp4', caption:'Side kick sweep combo practice 🥋' },
+].map(v => ({ ...v, source: randomUsername(v.file) }));
 
 const likes = JSON.parse(localStorage.getItem('pf_market_likes') || '{}');
 const saves = JSON.parse(localStorage.getItem('pf_market_saves') || '{}');
@@ -91,12 +104,27 @@ function persistLikes() { localStorage.setItem('pf_market_likes', JSON.stringify
 function persistSaves() { localStorage.setItem('pf_market_saves', JSON.stringify(saves)); }
 function persistComments() { localStorage.setItem('pf_market_comments', JSON.stringify(comments)); }
 
+// Gives each video a stable starting like count (seeded from its filename)
+// the FIRST time it's ever seen, then persists it — never re-rolled again.
+function seedLikeCount(key) {
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) hash = (hash * 17 + key.charCodeAt(i)) >>> 0;
+    return 5 + (hash % 40);
+}
+function getLikeState(key) {
+    if (!likes[key]) {
+        likes[key] = { on: false, count: seedLikeCount(key) };
+        persistLikes();
+    }
+    return likes[key];
+}
+
 function renderFeed() {
     const feed = document.getElementById('feed');
     feed.innerHTML = VIDEOS.map(v => {
         const key = v.file;
-        const likeCount = likes[key]?.count ?? Math.floor(Math.random()*40)+5;
-        const isLiked = !!likes[key]?.on;
+        const likeState = getLikeState(key);
+        const isLiked = likeState.on;
         const isSaved = !!saves[key];
         const commentCount = (comments[key] || []).length;
         return `
@@ -111,7 +139,7 @@ function renderFeed() {
             <div class="side-actions">
                 <button class="action-btn ${isLiked?'liked':''}" onclick="toggleLike('${key}')">
                     <span class="action-icon">${isLiked?'❤️':'🤍'}</span>
-                    <span class="action-count" id="like-count-${key}">${likeCount}</span>
+                    <span class="action-count" id="like-count-${key}">${likeState.count}</span>
                 </button>
                 <button class="action-btn" onclick="openComments('${key}')">
                     <span class="action-icon">💬</span>
@@ -139,7 +167,7 @@ function renderFeed() {
 }
 
 function toggleLike(id) {
-    const cur = likes[id] || { on:false, count: Math.floor(Math.random()*40)+5 };
+    const cur = getLikeState(id);
     cur.on = !cur.on;
     cur.count += cur.on ? 1 : -1;
     likes[id] = cur;
