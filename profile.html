@@ -107,15 +107,16 @@
         .tree-half:hover .tree-label { color: #ffe066; }
         .tree-half:hover #tree-img { opacity: 0.85; }
 
-        #tree-img { image-rendering: pixelated; max-height: 32vh; max-width: 100%; object-fit: contain; }
+        #tree-img { image-rendering: pixelated; max-height: 22vh; max-width: 100%; object-fit: contain; flex-shrink: 0; }
 
         .tree-label {
             font-family: 'Bangers', cursive;
-            font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+            font-size: clamp(1.4rem, 3vw, 2.2rem);
             color: #F7C948;
             letter-spacing: 0.14em;
             -webkit-text-stroke: 1px #3A1E00;
             text-shadow: 3px 3px 0 #3A1E00;
+            flex-shrink: 0;
         }
 
         /* ── Passions header ─────────────────────────────── */
