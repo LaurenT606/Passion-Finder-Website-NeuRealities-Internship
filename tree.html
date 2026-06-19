@@ -158,6 +158,7 @@
 </div>
 
 <script>
+function logout(){localStorage.removeItem('isLoggedIn');window.location.href='index.html';}
 const SUBJECT_EMOJI={'Math':'🍎','Science':'🍋','Art':'🍉','History':'🍊','English':'🍋','World Language':'🍇','Music':'🍓','Sports':'🍌','Extra-Curriculars':'🍍'};
 const SUBJECT_FRUIT_IMG={'Math':'apple.png','Science':'lemon.png','Art':'watermelon.png','History':'orange.png','English':'lemon.png','World Language':'grape.png','Music':'strawberry.png','Sports':'banana.png'};
 const FRUIT_PALS={'🍎':{'1':'#cc1111','2':'#1a7a1a','3':'#ff6666'},'🍋':{'1':'#ddcc00','2':'#1a7a1a','3':'#ffee66'},'🍉':{'1':'#cc2233','2':'#1a7a1a','3':'#ff6677'},'🍊':{'1':'#dd6600','2':'#1a7a1a','3':'#ffaa44'},'🍇':{'1':'#882299','2':'#1a7a1a','3':'#cc66ee'},'🍓':{'1':'#cc1133','2':'#1a7a1a','3':'#ff6688'},'🍌':{'1':'#ddbb00','2':'#1a7a1a','3':'#ffee44'},'🍍':{'1':'#cc8800','2':'#1a7a1a','3':'#ffcc44'}};

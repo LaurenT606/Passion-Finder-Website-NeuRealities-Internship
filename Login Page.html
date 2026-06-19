@@ -354,10 +354,16 @@
                 alert('Please fill in your name, email, and password.');
                 return;
             }
+            const users = JSON.parse(localStorage.getItem('pf_users') || '[]');
+            const match = users.find(u => u.email === email && u.password === password);
+            if (!match) {
+                alert('No account found. Please sign up first.');
+                return;
+            }
             localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userName', name);
-            localStorage.setItem('userEmail', email);
-            window.location.href = 'Dashboard.html';
+            localStorage.setItem('userName', match.name);
+            localStorage.setItem('userEmail', match.email);
+            window.location.href = localStorage.getItem('selectedSubjects') ? 'tree.html' : 'fruitbowl.html';
         }
 
         function handleSignup() {
@@ -368,10 +374,16 @@
                 alert('Please fill in your name, email, and password.');
                 return;
             }
+            const users = JSON.parse(localStorage.getItem('pf_users') || '[]');
+            if (users.find(u => u.email === email)) {
+                alert('An account with that email already exists. Please log in.');
+                return;
+            }
+            users.push({ name, email, password });
+            localStorage.setItem('pf_users', JSON.stringify(users));
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('userName', name);
             localStorage.setItem('userEmail', email);
-            // New sign-ups always go to fruitbowl to pick passions
             window.location.href = 'fruitbowl.html';
         }
     </script>
